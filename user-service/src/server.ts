@@ -1,7 +1,11 @@
-import app from "./app";
+import express from "express";
+import userRoutes from "./routes/user.routes";
 
-const PORT = process.env.PORT || 3000;
+const app = express();
+app.use(express.json()); // Middleware para procesar JSON
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+// Aquí se registra el prefijo '/users' para todas las rutas definidas en userRoutes
+app.use("/users", userRoutes); // Registrar prefijo '/users' en todas las rutas definidas en '/routers/user.router'
+
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
