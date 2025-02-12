@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -16,4 +16,13 @@ export class User {
 
     @Column({ type: "text", nullable: true })
     refreshToken?: string | null;
+
+    @Column({ type: "timestamp", nullable: true })
+    refreshTokenExpiresAt!: Date | null;
+
+    @CreateDateColumn()
+    createdAt!: Date;
+
+    @UpdateDateColumn()
+    updatedAt!: Date; 
 }

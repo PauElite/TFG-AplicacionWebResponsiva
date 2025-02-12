@@ -8,6 +8,9 @@ import dotenv from "dotenv";
 // Cargar las variables de .env en process.env
 dotenv.config();
 
+const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
+const ACCESS_TOKEN_EXPIRATION_MINUTES = 15;
+
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
 
@@ -48,23 +51,25 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             return next({ status: 400, message: "Contraseña incorrecta" });
         }
 
-        // Genera el token que expirará en 1 hora
+        // Genera el token de acceso de corta duración
         const token = jwt.sign(
             { id: user.id, email: user.email },
             JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: `${ACCESS_TOKEN_EXPIRATION_MINUTES}m` }
         );
 
+        // Genera el token de refresco de larga duración
         const refreshToken = jwt.sign(
             { id: user.id },
             JWT_REFRESH_SECRET,
-            { expiresIn: "7d"}
+            { expiresIn: `${REFRESH_TOKEN_EXPIRATION_DAYS}d`}
         );
 
         user.refreshToken = refreshToken;
+        user.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000);
         await userService.saveUser(user);
 
-        res.status(200).json({ mensaje: "inicio de sesión exitoso", usuario: user , tokenAcceso: token })
+        res.status(200).json({ mensaje: "Inicio de sesión exitoso", usuario: user , tokenAcceso: token })
     } catch (error){
         next(error);
     }
@@ -83,19 +88,15 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
             return next({ status: 403, message: "Refresh Token inválido." });
         }
 
-        jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: jwt.JsonWebTokenError | null, decoded: any) => {
-            if (err) {
-                return next({ status: 403, message: "Refresh Token expirado o inválido." });
-            }
+        if (user.refreshTokenExpiresAt && new Date() > user.refreshTokenExpiresAt) {
+            user.refreshToken = null;
+            user.refreshTokenExpiresAt = null;
+            await userService.saveUser(user);
+            return next({ status: 403, message: "El Refresh Token ha expirado. Inicie sesión de nuevo." });
+        }
+        const accessToken = jwt.sign({ id:user.id, email:user.email }, JWT_SECRET, { expiresIn: "1h" });
 
-            if (!decoded || !decoded.id) {
-                return next({ status: 403, message: "Token sin información válida." })
-            }
-
-            const accessToken = jwt.sign({ id:user.id, email:user.email }, JWT_SECRET, { expiresIn: "1h" });
-
-            res.status(200).json({ accessToken });
-        });
+        res.status(200).json({ accessToken });
     } catch (error) {
         next(error);
     }
