@@ -4,14 +4,16 @@ import { RevokedToken } from "../models/revokedTokens.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { Console } from "console";
 
 // Cargar las variables de .env en process.env
 dotenv.config();
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 const ACCESS_TOKEN_EXPIRATION_MINUTES = 15;
-const MAX_FAILED_ATTEMPTS = 3;
-const LOCK_TIME_MINUTES = 1;
+const MAX_FAILED_LOGIN_ATTEMPTS = 3;
+const LOCK_TIME_LOGIN_MINUTES = 1;
+const RESET_PASSWORD_EXPIRATION_MINUTES = 5;
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
@@ -55,17 +57,17 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         if (!(await bcrypt.compare(password, user.password))){
             user.failedLoginAttempts += 1;
 
-            if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
-                user.lockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
+            if (user.failedLoginAttempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
+                user.lockedUntil = new Date(Date.now() + LOCK_TIME_LOGIN_MINUTES * 60 * 1000);
                 await userService.saveUser(user);
-                return next({ status: 403, message: `Cuenta bloqueada por demasiados intentos fallidos. Inténtelo de nuevo en ${LOCK_TIME_MINUTES} minutos` })
+                return next({ status: 403, message: `Cuenta bloqueada por demasiados intentos fallidos. Inténtelo de nuevo en ${LOCK_TIME_LOGIN_MINUTES} minutos` })
             }
 
             await userService.saveUser(user);
             if (user.failedLoginAttempts == 1) {
                 return next({ status: 401, message: "Contraseña incorrecta" });
             } else {
-                return next({ status: 401, message: `Contraseña incorrecta. Intentos restantes: ${MAX_FAILED_ATTEMPTS - user.failedLoginAttempts}` });
+                return next({ status: 401, message: `Contraseña incorrecta. Intentos restantes: ${MAX_FAILED_LOGIN_ATTEMPTS - user.failedLoginAttempts}` });
             }
             
         }
@@ -147,6 +149,65 @@ export const logoutUser = async (req: Request, res: Response, next: NextFunction
         await userService.saveUser(user);
 
         res.status(200).json({ mensaje: "Sesión cerrada exitosamente." });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { email } = req.body;
+        const user = await userService.getUserByEmail(email);
+
+        if (!user) {
+            return next({ status: 404, message: "Usuario no encontrado." });
+        }
+        console.log(RESET_PASSWORD_EXPIRATION_MINUTES);
+        console.log(`${RESET_PASSWORD_EXPIRATION_MINUTES}m`);
+        const resetToken = jwt.sign({ id: user.id}, JWT_SECRET, { expiresIn: `${RESET_PASSWORD_EXPIRATION_MINUTES}m` });
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = new Date(Date.now() + RESET_PASSWORD_EXPIRATION_MINUTES * 60 * 1000);
+        await userService.saveUser(user);
+
+        console.log(`🔗 Enlace de recuperación: http://localhost:3000/reset-password?token=${resetToken}`);
+
+        res.status(200).json({ message: "Correo enviado con instrucciones para restablecer la contraseña." });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return next({ status: 400, message: "Debes introducir el token y una nueva contraseña." })
+        }
+
+        const user = await userService.getUserByResetToken(token);
+
+        if (!user || !user.resetPasswordToken || user.resetPasswordToken !== token) {
+            return next({ status: 400, message: "Token inválido o ya utilizado." });
+        }
+
+        if (user.resetPasswordExpiresAt && new Date() > user.resetPasswordExpiresAt) {
+            return next({ status: 400, message: "El token ha expirado. Solicita uno nuevo." });
+        }
+
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        if (isSamePassword) {
+            return next({ status: 400, message: "La nueva contraseña no puede ser igual a la anterior." });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+
+        user.resetPasswordToken = null;
+        user.resetPasswordExpiresAt = null;
+        await userService.saveUser(user);
+        res.status(200).json({ message: "Contraseña actualizada correctamente." });
     } catch (error) {
         next(error);
     }

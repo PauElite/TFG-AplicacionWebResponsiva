@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { registerUser, loginUser, getAllUsers, refreshAccessToken, logoutUser } from "../controllers/user.controller";
+import { registerUser, loginUser, getAllUsers, refreshAccessToken, logoutUser, resetPassword, forgotPassword } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
 
@@ -13,5 +13,7 @@ router.get("/perfil", authMiddleware, (req: Request, res: Response) => {
 }); //Endpoint para acceder al perfil habiendo iniciado sesión
 router.post("/refresh", refreshAccessToken); //Endpoint para renovar el token de acceso
 router.post("/logout", authMiddleware, logoutUser); //Endpoint para cerrar sesión
+router.post("/forgot-password", forgotPassword); //Endpoint para contraseña olvidada
+router.post("/reset-password", resetPassword); //Endpoint para restablecer la contraseña
 
 export default router;

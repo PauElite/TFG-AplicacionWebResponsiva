@@ -37,6 +37,10 @@ export class UserService {
         return await this.userRepository.findOne({ where: { refreshToken }});
     }
 
+    async getUserByResetToken(resetToken: string): Promise<User | null> {
+        return await this.userRepository.findOne({ where: { resetPasswordToken: resetToken } })
+    }
+
     async getUserById(id: number): Promise<User | null> {
         return await this.userRepository.findOne({ where: { id } });
     }
