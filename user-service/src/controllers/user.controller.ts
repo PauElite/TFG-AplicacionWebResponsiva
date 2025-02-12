@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user.service";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+// Cargar las variables de .env en process.env
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -39,7 +46,13 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             return next({ status: 400, message: "Contraseña incorrecta" });
         }
 
-        res.status(200).json({ mensaje: "inicio de sesión exitoso", usuario: user })
+        // Genera el token que expirará en 1 hora
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+        res.status(200).json({ mensaje: "inicio de sesión exitoso", usuario: user , token: token})
     } catch (error){
         next(error);
     }

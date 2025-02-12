@@ -1,6 +1,10 @@
 import express from "express";
 import userRoutes from "./routes/user.routes";
-import { errorHandler} from "./middlewares/error.middleware"
+import dotenv from "dotenv";
+import { errorHandler} from "./middlewares/error.middleware";
+
+// Cargar las variables de .env en process.env
+dotenv.config();
 
 const app = express();
 app.use(express.json()); // Middleware para procesar JSON
@@ -11,5 +15,5 @@ app.use("/users", userRoutes);
 // Middleware de manejo de errores
 app.use(errorHandler);
 
-const PORT = process.env.PORT ||3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`✅ Servidor corriendo en http://localhost:${PORT}`));
