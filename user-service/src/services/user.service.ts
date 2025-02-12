@@ -1,17 +1,29 @@
+import { AppDataSource } from "../config/ormconfig";
+import { Repository } from "typeorm";
 import { User } from "../models/user.model";
-import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 
 export class UserService {
-    private users: User[] = []; // Simulación de base de datos en memoria
+    private userRepository: Repository<User>;
 
-    createUser(nombre: string, email: string, password: string): User {
-        const newUser = new User(uuidv4(), nombre, email, password);
-        this.users.push(newUser);
-        return newUser;
+    constructor() {
+        this.userRepository = AppDataSource.getRepository(User);
     }
 
-    getAllUsers(): User[] {
-        return this.users;
+    async createUser(name: string, email: string, password: string): Promise<User> {
+        // En primer lugar encriptamos la contraseña
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = this.userRepository.create({ name, email, password: hashedPassword });
+        return await this.userRepository.save(newUser);
+    }
+
+    async getUserByEmail(email: string): Promise<User | null> {
+        return await this.userRepository.findOne({where: { email }})
+    }
+
+    async getAllUsers(): Promise<User[]> {
+        return await this.userRepository.find();
     }
 }
 

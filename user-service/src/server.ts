@@ -11,5 +11,5 @@ app.use("/users", userRoutes);
 // Middleware de manejo de errores
 app.use(errorHandler);
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
+const PORT = process.env.PORT ||3000;
+app.listen(PORT, () => console.log(`✅ Servidor corriendo en http://localhost:${PORT}`));
