@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user.service";
 import { RevokedToken } from "../models/revokedTokens.model";
+import { sendResetPasswordEmail } from "../services/email.service";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Console } from "console";
 
 // Cargar las variables de .env en process.env
 dotenv.config();
@@ -162,15 +162,14 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         if (!user) {
             return next({ status: 404, message: "Usuario no encontrado." });
         }
-        console.log(RESET_PASSWORD_EXPIRATION_MINUTES);
-        console.log(`${RESET_PASSWORD_EXPIRATION_MINUTES}m`);
+        
         const resetToken = jwt.sign({ id: user.id}, JWT_SECRET, { expiresIn: `${RESET_PASSWORD_EXPIRATION_MINUTES}m` });
 
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpiresAt = new Date(Date.now() + RESET_PASSWORD_EXPIRATION_MINUTES * 60 * 1000);
         await userService.saveUser(user);
 
-        console.log(`🔗 Enlace de recuperación: http://localhost:3000/reset-password?token=${resetToken}`);
+        await sendResetPasswordEmail(email, resetToken);
 
         res.status(200).json({ message: "Correo enviado con instrucciones para restablecer la contraseña." });
     } catch (error) {
