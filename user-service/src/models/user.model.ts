@@ -14,6 +14,12 @@ export class User {
     @Column()
     password!: string;
 
+    @Column({ default: 0 })
+    failedLoginAttempts!: number;
+
+    @Column({ type: "timestamp", nullable: true })
+    lockedUntil!: Date | null;
+
     @Column({ type: "text", nullable: true })
     refreshToken?: string | null;
 

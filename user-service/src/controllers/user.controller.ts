@@ -10,6 +10,8 @@ dotenv.config();
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 const ACCESS_TOKEN_EXPIRATION_MINUTES = 15;
+const MAX_FAILED_ATTEMPTS = 3;
+const LOCK_TIME_MINUTES = 1;
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
@@ -46,10 +48,31 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             return next({ status: 400, message: "Usuario no encontrado" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch){
-            return next({ status: 400, message: "Contraseña incorrecta" });
+        if (user.lockedUntil && new Date() < user.lockedUntil) {
+            return next({ status: 403, message: `Cuenta bloqueada. Inténtelo después de las ${user.lockedUntil.toLocaleTimeString()}` });
         }
+
+        if (!(await bcrypt.compare(password, user.password))){
+            user.failedLoginAttempts += 1;
+
+            if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+                user.lockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
+                await userService.saveUser(user);
+                return next({ status: 403, message: `Cuenta bloqueada por demasiados intentos fallidos. Inténtelo de nuevo en ${LOCK_TIME_MINUTES} minutos` })
+            }
+
+            await userService.saveUser(user);
+            if (user.failedLoginAttempts == 1) {
+                return next({ status: 401, message: "Contraseña incorrecta" });
+            } else {
+                return next({ status: 401, message: `Contraseña incorrecta. Intentos restantes: ${MAX_FAILED_ATTEMPTS - user.failedLoginAttempts}` });
+            }
+            
+        }
+
+        user.failedLoginAttempts = 0;
+        user.lockedUntil = null;
+        await userService.saveUser(user);
 
         // Genera el token de acceso de corta duración
         const token = jwt.sign(
