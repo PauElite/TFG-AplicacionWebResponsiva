@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user.service";
 import { RevokedToken } from "../models/revokedTokens.model";
 import { sendResetPasswordEmail, sendVerificationEmail } from "../services/email.service";
-import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -36,7 +35,11 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             return next({ status: 400, message: "La contraseña debe tener al menos 5 caracteres y contener letras y números." });
         }
 
-        const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+        const emailVerificationToken = jwt.sign(
+            {email},
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
 
         const newUser = await userService.createUser(name, email, password, emailVerificationToken);
 
@@ -50,6 +53,40 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
+export const resendVerificationEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return next({ status: 400, message: "El correo es obligatorio." });
+        }
+
+        const user = await userService.getUserByEmail(email);
+        if (!user) {
+            return next({ status: 400, message: "Usuario no encontrado." });
+        }
+
+        if (user.isVerified) {
+            return next({ status: 400, message: "El usuario ya está verificado." });
+        }
+
+        const emailVerificationToken = jwt.sign(
+            {email},
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        user.emailVerificationToken = emailVerificationToken;
+        await userService.saveUser(user);
+
+        await sendVerificationEmail(email, emailVerificationToken);
+
+        console.log(`Token de verificación de email -> ${emailVerificationToken}`);
+        res.status(200).json({ message: "Se ha enviado un nuevo correo de verificación." });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { token } = req.query;
@@ -57,16 +94,26 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
             return next({ status: 400, message: "Token de verificación inválido." });
         }
 
-        const user = await userService.getUserByVerificationToken(token as string);
-        if (!user) {
-            return next({ status: 400, message: "Token inválido o ya utilizado." });
+        try {
+            const decoded = jwt.verify(token as string, JWT_SECRET) as {email: string, exp: number};
+    
+            const user = await userService.getUserByEmail(decoded.email);
+            if (!user || user.isVerified) {
+                return next({ status: 400, message: "Token inválido o ya utilizado." });
+            }
+    
+            user.isVerified = true;
+            user.emailVerificationToken = null;
+            await userService.saveUser(user);
+    
+            res.status(200).json({ message: "Correo verificado con éxito." });
+        } catch (error) {
+            if ((error as Error).name === "TokenExpiredError") {
+                return next ({ status: 400, message: "El token de verificación ha expirado." });
+            }
+            return next({ status: 400, message: "Token inválido." });
         }
 
-        user.isVerified = true;
-        user.emailVerificationToken = null;
-        await userService.saveUser(user);
-
-        res.status(200).json({ message: "Correo verificado con éxito." });
     } catch (error) {
         next(error);
     }

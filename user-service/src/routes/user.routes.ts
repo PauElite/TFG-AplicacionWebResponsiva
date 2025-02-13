@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { registerUser, loginUser, getAllUsers, refreshAccessToken, logoutUser, resetPassword, forgotPassword, verifyEmail } from "../controllers/user.controller";
+import { registerUser, loginUser, getAllUsers, refreshAccessToken, logoutUser, resetPassword, forgotPassword, verifyEmail, resendVerificationEmail } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
 
@@ -7,6 +7,7 @@ const router = Router();
 
 router.post("/register", registerUser); //Endpoint para registrar un usuario
 router.post("/verify-email", verifyEmail); //Endpoint para verificar el email
+router.post("/resend-verification-email", resendVerificationEmail); //Endpoint para reenviar el correo de verificación al email
 router.post("/login", loginUser); //Endpoint para iniciar sesión
 router.get("/", getAllUsers); //Endpoint para obtener todos los usuarios
 router.get("/perfil", authMiddleware, (req: Request, res: Response) => {
