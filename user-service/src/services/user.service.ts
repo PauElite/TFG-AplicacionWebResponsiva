@@ -13,11 +13,11 @@ export class UserService {
         this.revokedTokenRepository = AppDataSource.getRepository(RevokedToken);
     }
 
-    async createUser(name: string, email: string, password: string): Promise<User> {
+    async createUser(name: string, email: string, password: string, emailVerificationToken: string): Promise<User> {
         // En primer lugar encriptamos la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = this.userRepository.create({ name, email, password: hashedPassword });
+        const newUser = this.userRepository.create({ name, email, password: hashedPassword, emailVerificationToken });
         return await this.userRepository.save(newUser);
     }
     
@@ -51,6 +51,10 @@ export class UserService {
 
     async findRevokedToken(token: string): Promise<RevokedToken | null> {
         return await this.revokedTokenRepository.findOne({ where: { token } });
+    }
+
+    async getUserByVerificationToken(token: string): Promise<User | null> {
+        return await this.userRepository.findOne({ where: { emailVerificationToken: token } });
     }
 }
 

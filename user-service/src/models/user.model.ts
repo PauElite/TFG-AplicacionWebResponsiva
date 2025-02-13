@@ -11,6 +11,12 @@ export class User {
     @Column({ unique: true })
     email!: string;
 
+    @Column({ default: false })
+    isVerified!: boolean;
+
+    @Column({ type: "text", nullable: true })
+    emailVerificationToken!: string | null;
+
     @Column()
     password!: string;
 

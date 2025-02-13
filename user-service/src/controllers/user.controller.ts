@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user.service";
 import { RevokedToken } from "../models/revokedTokens.model";
-import { sendResetPasswordEmail } from "../services/email.service";
+import { sendResetPasswordEmail, sendVerificationEmail } from "../services/email.service";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -35,12 +36,41 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             return next({ status: 400, message: "La contraseña debe tener al menos 5 caracteres y contener letras y números." });
         }
 
-        const newUser = await userService.createUser(name, email, password);
+        const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+
+        const newUser = await userService.createUser(name, email, password, emailVerificationToken);
+
+        await sendVerificationEmail(email, emailVerificationToken);
+
+        console.log(`Token de verificación de email -> ${emailVerificationToken}`);
+
         res.status(201).json({ mensaje: "Usuario registrado", usuario: newUser });
     } catch (error) {
         next(error);
     }
 };
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { token } = req.query;
+        if (!token) {
+            return next({ status: 400, message: "Token de verificación inválido." });
+        }
+
+        const user = await userService.getUserByVerificationToken(token as string);
+        if (!user) {
+            return next({ status: 400, message: "Token inválido o ya utilizado." });
+        }
+
+        user.isVerified = true;
+        user.emailVerificationToken = null;
+        await userService.saveUser(user);
+
+        res.status(200).json({ message: "Correo verificado con éxito." });
+    } catch (error) {
+        next(error);
+    }
+}
 
 export const loginUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
@@ -53,6 +83,10 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const user = await userService.getUserByEmail(email);
         if (!user){
             return next({ status: 400, message: "Usuario no encontrado" });
+        }
+
+        if (!user.isVerified) {
+            return next({ status: 400, message: "Debes verificar tu correo antes de iniciar sesión" });
         }
 
         if (user.lockedUntil && new Date() < user.lockedUntil) {
@@ -177,6 +211,8 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         await sendResetPasswordEmail(email, resetToken);
 
         res.status(200).json({ message: "Correo enviado con instrucciones para restablecer la contraseña." });
+
+        console.log(`Token de recuperación de contraseña -> ${resetToken}`);
     } catch (error) {
         next(error);
     }

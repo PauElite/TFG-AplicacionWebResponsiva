@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendResetPasswordEmail = async (email: string, token: string): Promise<void> => {
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const resetLink = `${process.env.FRONTEND_URL}/users/reset-password?token=${token}`;
     
     await transporter.sendMail({
         from: `"Soporte de la App" <${process.env.EMAIL_USER}>`,
@@ -24,4 +24,18 @@ export const sendResetPasswordEmail = async (email: string, token: string): Prom
     });
 
     console.log(`📧 Email de recuperación enviado a: ${email}`);
+};
+
+export const sendVerificationEmail = async (email: string, token: string) => {
+    const verificationLink = `${process.env.FRONTEND_URL}/users/verify-email?token=${token}`;
+
+    await transporter.sendMail({
+        from: `"Soporte" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Verifica tu cuenta",
+        html: `<p>Gracias por registrarte. Haz clic en el siguiente enlace para verificar tu cuenta:</p>
+               <a href="${verificationLink}">${verificationLink}</a>`
+    });
+
+    console.log(`📧 Email de verificación enviado a: ${email}`);
 };
