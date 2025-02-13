@@ -8,7 +8,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const authHeader = req.header("Authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return next({ status: 401, message: "Acceso denegado. No hay token." });
+        return next({ status: 401, message: "Acceso denegado. Token inválido." });
     }
 
     const token = authHeader.split(" ")[1];
@@ -19,8 +19,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET) as { id: number, iat: number };
         req.user = decoded;
+
         next();
     } catch (error) {
         return next({ status: 401, message: "Token inválido o expirado." });

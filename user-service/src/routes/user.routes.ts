@@ -14,6 +14,6 @@ router.get("/perfil", authMiddleware, (req: Request, res: Response) => {
 router.post("/refresh", refreshAccessToken); //Endpoint para renovar el token de acceso
 router.post("/logout", authMiddleware, logoutUser); //Endpoint para cerrar sesión
 router.post("/forgot-password", forgotPassword); //Endpoint para contraseña olvidada
-router.post("/reset-password", resetPassword); //Endpoint para restablecer la contraseña
+router.post("/reset-password", authMiddleware, resetPassword); //Endpoint para restablecer la contraseña
 
 export default router;

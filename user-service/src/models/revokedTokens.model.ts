@@ -9,5 +9,5 @@ export class RevokedToken {
     token!: string;
 
     @CreateDateColumn()
-    createdAt!: Date;
+    revokedAt!: Date;
 }

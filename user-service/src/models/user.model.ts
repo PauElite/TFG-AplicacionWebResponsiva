@@ -20,6 +20,9 @@ export class User {
     @Column({ type: "timestamp", nullable: true })
     resetPasswordExpiresAt!: Date | null;
 
+    @Column({ type: "timestamp", nullable: true })
+    passwordChangedAt!: Date | null;
+
     @Column({ default: 0 })
     failedLoginAttempts!: number;
 

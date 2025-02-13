@@ -30,6 +30,11 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             return next({ status: 400, message: "El email ya está en uso" });
         }
 
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+        if (!passwordRegex.test(password)) {
+            return next({ status: 400, message: "La contraseña debe tener al menos 5 caracteres y contener letras y números." });
+        }
+
         const newUser = await userService.createUser(name, email, password);
         res.status(201).json({ mensaje: "Usuario registrado", usuario: newUser });
     } catch (error) {
@@ -200,11 +205,29 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
             return next({ status: 400, message: "La nueva contraseña no puede ser igual a la anterior." });
         }
 
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return next({ status: 400, message: "La contraseña debe tener al menos 5 caracteres y contener letras y números." });
+        }
+
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
 
+        const tokenAcceso = req.header("Authorization")?.split(" ")[1];
+        if (tokenAcceso) {
+            const revokedToken = new RevokedToken();
+            revokedToken.token = tokenAcceso;
+            await userService.saveRevokedToken(revokedToken);
+        }
+
+        user.refreshToken = null;
+        user.refreshTokenExpiresAt = null;
+
+        user.passwordChangedAt = new Date();
+
         user.resetPasswordToken = null;
         user.resetPasswordExpiresAt = null;
+
         await userService.saveUser(user);
         res.status(200).json({ message: "Contraseña actualizada correctamente." });
     } catch (error) {
