@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response, NextFunction, Router } from "express";
 import { registerUser, loginUser, getAllUsers, refreshAccessToken, logoutUser, resetPassword, forgotPassword, verifyEmail, resendVerificationEmail } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
