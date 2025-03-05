@@ -1,0 +1,38 @@
+"use client";
+
+import { useState } from "react";
+import { api } from "../../utils/api";
+import { useRouter } from "next/navigation";
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post("/register", { name, email, password });
+      alert("Registro exitoso. Verifica tu email.");
+      router.push("/login");
+    } catch (error) {
+      alert("Error en el registro");
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-screen">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
+        <h2 className="text-xl font-bold mb-4">Registro</h2>
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+          className="block w-full p-2 border rounded mb-2" placeholder="Nombre"/>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          className="block w-full p-2 border rounded mb-2" placeholder="Correo electrónico"/>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+          className="block w-full p-2 border rounded mb-2" placeholder="Contraseña"/>
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Registrarse</button>
+      </form>
+    </div>
+  );
+}

@@ -12,7 +12,7 @@ const app = express();
 // Middleware de CORS
 app.use(
     cors({
-        origin: "http://localhost:5173", // Permite solicitudes desde este origen
+        origin: "http://localhost:3001", // Permite solicitudes desde este origen
         credentials: true, // Permite el envío de credenciales (cookies, tokens, etc.)
     })
 );
