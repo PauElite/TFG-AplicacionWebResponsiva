@@ -19,6 +19,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 
     try {
+        console.log("Verificando token: ", token);
         const decoded = jwt.verify(token, JWT_SECRET) as { id: number, iat: number };
         req.user = decoded;
 

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "../../utils/api";
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const { register } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -13,12 +14,12 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post("/register", { name, email, password });
-      alert("Registro exitoso. Verifica tu email.");
-      router.push("/login");
-    } catch (error) {
-      alert("Error en el registro");
-    }
+      await register(name, email, password);
+      alert("Registro exitoso. Verifica tu email."); // Muestra un mensaje de éxito
+      router.push("/login"); // Redirige al perfil si el registro es exitoso
+  } catch (error: any) {
+      alert(error.message);; // Muestra el mensaje de error si falla
+  }
   };
 
   return (

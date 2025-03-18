@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
-const ACCESS_TOKEN_EXPIRATION_MINUTES = 15;
+const ACCESS_TOKEN_EXPIRATION_MINUTES = 1;
 const MAX_FAILED_LOGIN_ATTEMPTS = 3;
 const LOCK_TIME_LOGIN_MINUTES = 1;
 const RESET_PASSWORD_EXPIRATION_MINUTES = 5;
@@ -205,7 +205,7 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
             await userService.saveUser(user);
             return next({ status: 403, message: "El Refresh Token ha expirado. Inicie sesión de nuevo." });
         }
-        const accessToken = jwt.sign({ id:user.id, email:user.email }, JWT_SECRET, { expiresIn: "1h" });
+        const accessToken = jwt.sign({ id:user.id, email:user.email }, JWT_SECRET, { expiresIn: `${ACCESS_TOKEN_EXPIRATION_MINUTES}m` });
 
         res.status(200).json({ accessToken });
     } catch (error) {

@@ -14,9 +14,9 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await login(email, password);
-      router.push("/perfil"); // Redirige al perfil tras el login
-    } catch (error) {
-      alert("Error en el login");
+      router.push("/");
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 
