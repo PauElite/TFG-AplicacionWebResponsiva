@@ -1,6 +1,5 @@
 import { DataSource } from "typeorm";
-import { User } from "../models/user.model";
-import { RevokedToken } from "../models/revokedTokens.model";
+import { Recipe } from "../models/recipe.model";
 import dotenv from "dotenv"
 
 dotenv.config();
@@ -13,9 +12,8 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     logging: ["error", "warn"], // Para que la consola solo muestre errores y advertencias
-    entities: [User, RevokedToken],
+    entities: [Recipe],
 });
-
 AppDataSource.initialize()
-    .then(() => console.log("✅ Conexión del microservicio Usuarios a la base de datos establecida"))
+    .then(() => console.log("✅ Conexión del microservicio Recetas a la base de datos establecida"))
     .catch((error) => console.error("❌ Error al conectar a la base de datos:", error));
