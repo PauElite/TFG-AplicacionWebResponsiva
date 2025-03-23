@@ -16,7 +16,7 @@ const recipeSchema = Joi.object({
   ).required(),
   prepTime: Joi.number().min(1).required(),
   difficulty: Joi.number().valid(1, 2, 3, 4, 5).required(),
-  imageUrl: Joi.string().uri().optional()
+  imageUrl: Joi.string().uri().required()
 });
 
 const updateRecipeSchema = recipeSchema.fork(
