@@ -15,24 +15,41 @@ export default function RegisterPage() {
     e.preventDefault();
     try {
       await register(name, email, password);
-      alert("Registro exitoso. Verifica tu email."); // Muestra un mensaje de éxito
-      router.push("/login"); // Redirige al perfil si el registro es exitoso
-  } catch (error: any) {
-      alert(error.message);; // Muestra el mensaje de error si falla
-  }
+      alert("Registro exitoso. Verifica tu email.");
+      router.push("/login");
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
-        <h2 className="text-xl font-bold mb-4">Registro</h2>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-          className="block w-full p-2 border rounded mb-2" placeholder="Nombre"/>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="block w-full p-2 border rounded mb-2" placeholder="Correo electrónico"/>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-          className="block w-full p-2 border rounded mb-2" placeholder="Contraseña"/>
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Registrarse</button>
+    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        <h2 className="text-2xl font-bold mb-4 text-center">Registro</h2>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="block w-full p-2 border rounded mb-3 text-sm"
+          placeholder="Nombre"
+        />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="block w-full p-2 border rounded mb-3 text-sm"
+          placeholder="Correo electrónico"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="block w-full p-2 border rounded mb-4 text-sm"
+          placeholder="Contraseña"
+        />
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full text-sm hover:bg-blue-600 transition">
+          Registrarse
+        </button>
       </form>
     </div>
   );

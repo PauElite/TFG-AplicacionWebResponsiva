@@ -33,28 +33,32 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen py-1">
-      <h1 className="text-4xl font-bold text-center mb-6">Bienvenido a El Fogón Rebelde</h1>
+    <div className="flex flex-col items-center min-h-screen px-4 py-8">
+  <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6">
+    Bienvenido a El Fogón Rebelde
+  </h1>
 
-      {/* Aquí hemos añadido un margen entre el título y las recetas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="bg-white p-4 rounded shadow-md">
-            <Link href={`/recipes/${recipe.id}`}>
-              <img
-                src={recipe.imageUrl}
-                alt={recipe.title}
-                className="w-full h-48 object-cover rounded mb-4 cursor-pointer"
-              />
-            </Link>
-            <h2 className="text-2xl font-bold mt-4">{recipe.title}</h2>
-            <p className="text-gray-600 mt-2">{recipe.description}</p>
-            <Link href={`/recipes/${recipe.id}`} className="text-blue-500 mt-4 block hover:underline">
-  Ver receta
-</Link>
-          </div>
-        ))}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+    {recipes.map((recipe) => (
+      <div key={recipe.id} className="bg-white p-4 rounded shadow-md flex flex-col">
+        <Link href={`/recipes/${recipe.id}`}>
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            className="w-full h-48 object-cover rounded mb-4"
+          />
+        </Link>
+        <h2 className="text-xl font-bold mt-2">{recipe.title}</h2>
+        <p className="text-gray-600 text-sm mb-2">{recipe.description}</p>
+        <Link
+          href={`/recipes/${recipe.id}`}
+          className="text-blue-500 mt-auto hover:underline"
+        >
+          Ver receta
+        </Link>
       </div>
-    </div>
+    ))}
+  </div>
+</div>
   );
 }
