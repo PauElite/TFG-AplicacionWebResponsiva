@@ -27,6 +27,6 @@ app.use("/recetas", recipeRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => console.log(`✅ Servidor corriendo en http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Recetas corriendo en http://localhost:${PORT}`));
 
 export default app;
