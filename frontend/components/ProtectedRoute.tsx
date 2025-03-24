@@ -19,11 +19,14 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-6">
-        <div className="bg-white p-6 rounded shadow-md text-center">
-          <h2 className="text-lg font-bold mb-4">Acceso restringido</h2>
-          <p className="text-gray-700">Debes iniciar sesión para acceder a esta página.</p>
-          <Link href="/login" className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      <div className="flex flex-col items-center justify-center px-4">
+        <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg text-center space-y-4">
+          <h2 className="text-xl font-semibold text-gray-800">Acceso restringido</h2>
+          <p className="text-gray-600">Debes iniciar sesión para acceder a esta página.</p>
+          <Link
+            href="/login"
+            className="inline-block bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
             Iniciar sesión
           </Link>
         </div>

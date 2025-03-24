@@ -14,7 +14,7 @@ export default function PerfilPage() {
     const checkAuth = async () => {
       const valid = await isTokenValid();
       if (!valid) {
-        router.push("/login"); // Redirige si no hay token válido
+        //router.push("/login"); // Redirige si no hay token válido
       } else {
         setLoading(false);
       }
