@@ -7,15 +7,24 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="bg-blue-600 p-4 text-white shadow-md">
-      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+    <nav className="bg-pink-300 p-4 text-white shadow-md">
+      <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-2 sm:gap-0">
         <Link href="/" className="text-lg font-bold">El Fogón Rebelde</Link>
 
-        <div className="flex gap-4 flex-wrap justify-center">
+        <div className="flex items-center gap-4 flex-wrap justify-center">
+          <Link
+            href="/recipes/new"
+            className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+          >
+            Subir mi propia receta
+          </Link>
+        </div>
+        <div className="flex items-center gap-4 flex-wrap justify-center">
           {user ? (
             <>
-              <Link href="/perfil" className="hover:underline">Perfil</Link>
+              <Link href="/profile" className="hover:underline">Perfil</Link>
               <button onClick={logout} className="hover:underline">Cerrar sesión</button>
+
             </>
           ) : (
             <>
