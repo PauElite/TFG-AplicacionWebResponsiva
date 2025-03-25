@@ -1,0 +1,23 @@
+import { useState } from 'react';
+import { recipeService } from '@/services/recipeService';
+import { RecetaFormData } from '@/types/receta';
+
+export const useCreateRecipe = () => {
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<boolean>(false);
+
+    const createRecipe = async (recipe: RecetaFormData) => {
+        try {
+            setLoading(true);
+            const newRecipe = await recipeService.createRecipe(recipe);
+            setSuccess(true);
+            return newRecipe;
+        } catch (error) {
+            setError("No se pudo crear la receta");
+        } finally {
+            setLoading(false);
+        }
+    }
+    return { loading, error, success, createRecipe };
+};

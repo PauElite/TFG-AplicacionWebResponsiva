@@ -1,10 +1,10 @@
 "use client";
 
-import { useAllRecipes } from "@/hooks/useAllRecipes";
+import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
 import { RecipeList } from "@/components/RecipeList";
 
 export default function Home() {
-  const { recipes, loading, error } = useAllRecipes();
+  const { recipes, loading, error } = useGetAllRecipes();
 
   if (loading) {
     return (

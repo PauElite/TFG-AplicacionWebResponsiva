@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import { recipeService } from '@/services/recipeService';
 
-export const useAllRecipes = () => {
+export const useGetAllRecipes = () => {
     const [recipes, setRecipes] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -9,7 +9,6 @@ export const useAllRecipes = () => {
     useEffect(() => {
         const loadAllRecipes = async () => {
         try {
-            setLoading(true);
             const data = await recipeService.fetchRecipes();
             setRecipes(data);
         } catch (error) {
@@ -22,5 +21,5 @@ export const useAllRecipes = () => {
         loadAllRecipes();
     }, []);
 
-    return { recipes, loading, error, reloadAllRecipes: useAllRecipes };
+    return { recipes, loading, error, reloadAllRecipes: useGetAllRecipes };
 };
