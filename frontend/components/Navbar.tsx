@@ -7,7 +7,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="bg-pink-300 p-4 text-white shadow-md">
+    <nav className="bg-green-300 p-4 text-white shadow-md">
       <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-2 sm:gap-0">
         <Link href="/" className="text-lg font-bold">El Fogón Rebelde</Link>
 
