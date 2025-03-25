@@ -18,11 +18,8 @@ const NewRecipePage = () => {
             const recipe = await recipeService.createRecipe(formData);
             setSuccess(true);
             router.push(`/recipes/${recipe.id}`);
-
         } catch (error) {
             setError("No se pudo crear la receta");
-        } finally {
-            setLoading(false);
         }
     };
     

@@ -15,8 +15,6 @@ export const useCreateRecipe = () => {
             return newRecipe;
         } catch (error) {
             setError("No se pudo crear la receta");
-        } finally {
-            setLoading(false);
         }
     }
     return { loading, error, success, createRecipe };

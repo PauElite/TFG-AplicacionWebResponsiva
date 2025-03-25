@@ -229,7 +229,7 @@ export const RecipeForm = ({ onSubmit, loading, error } : RecipeFormProps) => {
                             type="submit"
                             className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium"
                         >
-                            {loading ? 'Creando... : ' : 'Publicar receta'}
+                            {loading ? 'Creando...' : 'Publicar receta'}
                         </button>
                     </div>
                 </form>
