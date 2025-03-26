@@ -1,19 +1,11 @@
 "use client";
 
 import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
-import { RecipeList } from "@/components/RecipeList";
+import { RecipeList } from "@/components/recipes/RecipeList";
+import { BurgerLoadingAnimation } from "@/components/views/loading/BurgerLoadingAnimation";
 
 export default function Home() {
   const { recipes, loading, error } = useGetAllRecipes();
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Cargando recetas...</h1>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -27,7 +19,14 @@ export default function Home() {
       <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6">
         Bienvenido a El Fogón Rebelde
       </h1>
-      <RecipeList recipes={recipes} />
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <BurgerLoadingAnimation />
+          <h1 className="text-4xl font-bold">Cargando recetas...</h1>
+        </div>
+      ) : (
+        <RecipeList recipes={recipes} />
+      )}
     </div>
   );
 }

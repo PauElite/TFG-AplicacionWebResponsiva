@@ -1,8 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { AuthProvider, useAuth } from "../context/AuthContext";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../components/views/Navbar";
+import Footer from "../components/views/Footer";
 
 export const metadata: Metadata = {
   title: "Mi Aplicación",
