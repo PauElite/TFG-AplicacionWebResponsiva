@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Check } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Check, ManyToOne } from "typeorm";
 
 // Definir la interfaz para un paso
 interface Paso {
@@ -34,6 +34,9 @@ export class Recipe {
   @Check(`"difficulty" BETWEEN '1' AND '5'`)  // Restricción de valor entre 1 y 5
   difficulty?: string;
 
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: "varchar"})
   imageUrl?: string;
+
+  @Column({ nullable: true })
+  creatorId!: number;
 }

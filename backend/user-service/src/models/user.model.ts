@@ -45,5 +45,9 @@ export class User {
     createdAt!: Date;
 
     @UpdateDateColumn()
-    updatedAt!: Date; 
+    updatedAt!: Date;
+
+    @Column("int", { array: true, default: []})
+    recipeIds!: number[];
+
 }

@@ -1,23 +1,19 @@
 "use client";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { RecipeForm } from "@/components/recipes/RecipeForm";
-import { recipeService } from "@/services/recipeService";
+import { useCreateRecipe } from "@/hooks/useCreateRecipe";
 
 const NewRecipePage = () => {
     const router = useRouter();
-    const [ loading, setLoading ] = useState(false);
-    const [ error, setError ] = useState<string | null>(null);
+    const { createRecipe, loading, error } = useCreateRecipe();
 
     const handleSubmit = async (formData: any) => {
-        setLoading(true);
-        setError(null);
         try {
-            const recipe = await recipeService.createRecipe(formData);
-            router.push(`/recipes/${recipe.id}`);
+            const recipe = await createRecipe(formData);
+            router.push(`/recipes/${recipe?.id}`);
         } catch (error) {
-            setError("No se pudo crear la receta");
+            error = "No se pudo crear la receta: " + error;
         }
     };
     

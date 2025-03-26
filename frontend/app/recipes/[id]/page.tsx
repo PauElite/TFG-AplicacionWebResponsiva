@@ -3,26 +3,52 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { userService } from "@/services/userService";
+import { get } from "http";
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { getUserById } = userService;
+  const [username, setUsername] = useState<any>(null);
   const { id } = useParams(); // Obtener el ID de la URL dinámica
 
   useEffect(() => {
-    if (id) {
-      // Obtener los detalles de la receta
-      axios
-        .get(`http://localhost:3002/recetas/${id}`)
-        .then((response) => {
-          setRecipe(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error al obtener la receta:", error);
-          setLoading(false);
-        });
+    const loadRecipe = async () => {
+      try {
+        // 1. Espera a que se complete la petición de la receta
+        const recipe = await axios.get(`http://localhost:3002/recetas/${id}`);
+        setRecipe(recipe.data);
+
+        // 2. Solo si existe creatorId, busca al usuario
+        if (recipe.data.creatorId) {
+          const name = await getUserById(recipe.data.creatorId);
+          setUsername(name);
+        }
+
+      } catch (error) {
+        console.error("Error cargando datos de la receta:", error);
+      } finally {
+        setLoading(false);
+      }
+      /*if (id) {
+        // Obtener los detalles de la receta
+        axios
+          .get(`http://localhost:3002/recetas/${id}`)
+          .then((response) => {
+            setRecipe(response.data);
+            setUser(getUserById(recipe.creatorId));
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error al obtener la receta:", error);
+            setLoading(false);
+          });
+          
+      }*/
     }
+
+    loadRecipe();
   }, [id]);
 
   if (loading) {
@@ -87,7 +113,7 @@ export default function RecipeDetail() {
             </div>
           ))}
         </div>
-
+        <h1 className="text-xs text-gray-800 text-right mb-4">Receta subida por: {username}</h1>
       </div>
     </div>
   );

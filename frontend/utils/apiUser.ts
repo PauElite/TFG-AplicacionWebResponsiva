@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3001/recetas/users";
+const USERS_API_URL = "http://localhost:3001/recetas/users";
 
-export const api = axios.create({
-  baseURL: API_URL,
+export const apiUser = axios.create({
+  baseURL: USERS_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -14,7 +14,7 @@ export const api = axios.create({
 const getAuthToken = () => localStorage.getItem("accessToken");
 
 // Interceptor para adjuntar el token en cada petición
-api.interceptors.request.use(
+apiUser.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
     if (token) {
@@ -27,8 +27,8 @@ api.interceptors.request.use(
 );
 
 // Función para configurar la instancia de Axios con el logout del contexto
-export const setupInterceptors = (logout: () => void) => {
-  api.interceptors.response.use(
+export const setupUserInterceptors = (logout: () => void) => {
+  apiUser.interceptors.response.use(
     (response) => response, // Si la respuesta es exitosa, devolverla tal cual
     async (error) => {
       const originalRequest = error.config;
@@ -45,7 +45,7 @@ export const setupInterceptors = (logout: () => void) => {
           if (!refreshToken) throw new Error("No hay token de refresco");
 
           // Enviar petición para renovar el token
-          const { data } = await api.post("/refresh", { refreshToken });
+          const { data } = await apiUser.post("/refresh", { refreshToken });
           console.log("✅ Nuevo token recibido:", data.tokenAcceso);
 
           // Guardar el nuevo token de acceso
@@ -55,7 +55,7 @@ export const setupInterceptors = (logout: () => void) => {
           originalRequest.headers = originalRequest.headers || {}; // Asegurar que headers no es undefined
           originalRequest.headers["Authorization"] = `Bearer ${data.tokenAcceso}`;
 
-          return api(originalRequest);
+          return apiUser(originalRequest);
         } catch (refreshError) {
           console.error("❌ Error al renovar el token:", refreshError);
           localStorage.removeItem("accessToken");

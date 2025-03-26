@@ -10,7 +10,8 @@ export class RecipeService {
   }
 
   // Crear una receta
-  async createRecipe(title: string, description: string, ingredients: string[], instructions: any[], prepTime: number, difficulty: string, imageUrl: string): Promise<Recipe> {
+  async createRecipe(title: string, description: string, ingredients: string[], 
+    instructions: any[], prepTime: number, difficulty: string, imageUrl: string, creatorId: number): Promise<Recipe> {
     const newRecipe = this.recipeRepository.create({
       title,
       description,
@@ -19,8 +20,16 @@ export class RecipeService {
       prepTime,
       difficulty,
       imageUrl,
+      creatorId
     });
-    return await this.recipeRepository.save(newRecipe);
+    const recipe = await this.recipeRepository.save(newRecipe);
+
+    await AppDataSource.query(
+      `UPDATE "user" SET "recipeIds" = array_append("recipeIds", $1) WHERE id = $2`, 
+      [recipe.id, creatorId]
+    );
+    return recipe;
+
   }
 
   // Obtener todas las recetas

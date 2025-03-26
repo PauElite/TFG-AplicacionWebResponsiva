@@ -10,6 +10,7 @@ interface Recipe {
   prepTime: number;
   difficulty: number;
   imageUrl: string;
+  creatorId: number;
 }
 
 class RecipeService {
@@ -29,9 +30,9 @@ class RecipeService {
         }
     }
 
-    async createRecipe(recipeData: RecetaFormData): Promise<Recipe> {
+    async createRecipe(recipeData: RecetaFormData, creatorId: number): Promise<Recipe> {
         try {
-            const response = await axios.post(this.apiUrl, recipeData);
+            const response = await axios.post(this.apiUrl, {...recipeData, creatorId });
             return response.data.newRecipe;
         } catch (error) {
             console.error("Error al crear la receta", error);

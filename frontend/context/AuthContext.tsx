@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { api, setupInterceptors } from "../utils/api";
+import { apiUser, setupUserInterceptors } from "../utils/apiUser";
 import { jwtDecode } from "jwt-decode";
+import { setupRecipeInterceptors } from "@/utils/apiRecipe";
 
 interface User {
   id: number;
@@ -30,13 +31,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    setupInterceptors(logout);
+    setupUserInterceptors(logout);
+    setupRecipeInterceptors(logout);
   }, []);
 
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      await api.post("/register", { name, email, password });
+      await apiUser.post("/register", { name, email, password });
     } catch (error: any) {
       console.error("Error en registro:", error);
       // Verifica si el error proviene del backend y contiene información relevante
@@ -50,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/login", { email, password });
+      const response = await apiUser.post("/login", { email, password });
 
       setUser(response.data.usuario); // Guardamos el usuario en el estado
       
@@ -101,11 +103,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      const response = await api.post("/refresh", { refreshToken });
+      const response = await apiUser.post("/refresh", { refreshToken });
 
       console.log("Nuevo token de acceso obtenido:", response.data.accessToken);
       localStorage.setItem("accessToken", response.data.accessToken);
-      api.defaults.headers["Authorization"] = `Bearer ${response.data.accessToken}`;
+      apiUser.defaults.headers["Authorization"] = `Bearer ${response.data.accessToken}`;
 
       return response.data.accessToken;
     } catch (error) {
@@ -118,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      //await api.post("/logout");
+      //await apiUser.post("/logout");
       localStorage.removeItem("accessToken"); // Eliminar el accessToken al cerrar sesión
       localStorage.removeItem("refreshToken"); // Eliminar el refreshToken al cerrar sesión
       setUser(null);
@@ -128,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    setupInterceptors(logout); // Configurar interceptores con el logout
+    setupUserInterceptors(logout); // Configurar interceptores con el logout
 }, []);
 
   return (

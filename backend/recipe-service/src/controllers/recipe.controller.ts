@@ -16,7 +16,8 @@ const recipeSchema = Joi.object({
   ).required(),
   prepTime: Joi.number().min(1).required(),
   difficulty: Joi.number().valid(1, 2, 3, 4, 5).required(),
-  imageUrl: Joi.string().uri().required()
+  imageUrl: Joi.string().uri().required(),
+  creatorId: Joi.number().required()
 });
 
 const updateRecipeSchema = recipeSchema.fork(
@@ -35,8 +36,8 @@ export const createRecipe = async (req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    const { title, description, ingredients, instructions, prepTime, difficulty, imageUrl } = req.body;
-    const newRecipe = await recipeService.createRecipe(title, description, ingredients, instructions, prepTime, difficulty, imageUrl);
+    const { title, description, ingredients, instructions, prepTime, difficulty, imageUrl, creatorId } = req.body;
+    const newRecipe = await recipeService.createRecipe(title, description, ingredients, instructions, prepTime, difficulty, imageUrl, creatorId);
     
     res.status(201).json({ message: "Receta creada con éxito", newRecipe });
   } catch (error) {

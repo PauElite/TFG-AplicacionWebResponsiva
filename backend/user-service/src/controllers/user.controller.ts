@@ -326,3 +326,17 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
+
+
+export const getBasicUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const user = await userService.getUserById(Number(id));
+        if (!user) {
+            return next({ status: 404, message: "Usuario no encontrado" });
+        }
+        res.status(200).json(user.name);
+    } catch (error) {
+        next(error);
+    }
+};
