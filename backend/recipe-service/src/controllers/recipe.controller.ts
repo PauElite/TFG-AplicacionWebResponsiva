@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../config/ormconfig";
-import { Recipe } from "../models/recipe.model";
 import { recipeService } from "../services/recipe.service";
 import Joi from "joi";
 
@@ -24,8 +22,6 @@ const updateRecipeSchema = recipeSchema.fork(
   Object.keys(recipeSchema.describe().keys),
   (schema) => schema.optional()
 );
-
-const recipeRepository = AppDataSource.getRepository(Recipe);
 
 // Crear una receta
 export const createRecipe = async (req: Request, res: Response, next: NextFunction) => {
@@ -118,3 +114,19 @@ export const getAllRecipes = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+// Obtener recetas por ID de creador
+export const getRecipesByCreator = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { creatorId } = req.params;
+    if (!creatorId) {
+      return next({ status: 400, message: "El ID del creador es obligatorio" });
+    }
+
+    const recipes = await recipeService.getRecipesByCreator(Number(creatorId));
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error("Error al obtener las recetas del creador", error);
+    next(error);
+  }
+}

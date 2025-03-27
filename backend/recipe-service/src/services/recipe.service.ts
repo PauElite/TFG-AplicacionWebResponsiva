@@ -67,6 +67,12 @@ export class RecipeService {
     await this.recipeRepository.remove(recipe);
     return true;  // Receta eliminada con éxito
   }
+
+  // Obtener recetas por ID de creador
+  async getRecipesByCreator(creatorId: number): Promise<Recipe[]> {
+    return await this.recipeRepository.find({ where: { creatorId } });
+  }
+
 }
 
 export const recipeService = new RecipeService();

@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { recipeService } from '@/services/recipeService';
 
 export const useGetAllRecipes = () => {

@@ -50,4 +50,7 @@ export class User {
     @Column("int", { array: true, default: []})
     recipeIds!: number[];
 
+    @Column({default: "avatar1"})
+    avatar!: string;
+
 }

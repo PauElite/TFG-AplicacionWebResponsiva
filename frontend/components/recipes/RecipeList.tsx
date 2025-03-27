@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { useState } from "react";
+
 
 interface Recipe {
     id: number;
@@ -13,13 +15,26 @@ interface RecipeListProps {
 }
 
 export const RecipeList = ({ recipes }: RecipeListProps) => {
+    const [visibleCount, setVisibleCount] = useState(6);
+    const [loading, setLoading] = useState(false);
+
+    const visibleRecipes = recipes.slice(0, visibleCount);
+
+    const loadMoreRecipes = () => {
+        setLoading(true);
+        setTimeout(() => {
+            setVisibleCount((prevCount) => prevCount + 6);
+            setLoading(false);
+        }, 500); // Simulate loading time
+    }
+
     if (recipes.length === 0) {
         return <div className="text-center py-8">No hay recetas disponibles</div>;
     }
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-            {recipes.map((recipe) => (
+            {visibleRecipes.map((recipe) => (
                 <div key={recipe.id} className="bg-white p-4 rounded shadow-md flex flex-col">
                     <Link href={`/recipes/${recipe.id}`}>
                         <img
@@ -44,6 +59,17 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
                     </div>
                 </div>
             ))}
+            {visibleRecipes.length < recipes.length && (
+                <div className="col-span-full text-center mt-8">
+                    <button
+                        onClick={loadMoreRecipes}
+                        disabled={loading}
+                        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+                    >
+                        {loading ? 'Cargando...' : 'Mostrar más recetas'}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

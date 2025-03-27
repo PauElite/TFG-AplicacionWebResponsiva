@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { userService } from "@/services/userService";
-import { get } from "http";
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
@@ -22,8 +21,8 @@ export default function RecipeDetail() {
 
         // 2. Solo si existe creatorId, busca al usuario
         if (recipe.data.creatorId) {
-          const name = await getUserById(recipe.data.creatorId);
-          setUsername(name);
+          const response = await getUserById(recipe.data.creatorId);
+          setUsername(response.name);
         }
 
       } catch (error) {

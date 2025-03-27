@@ -30,6 +30,16 @@ class RecipeService {
         }
     }
 
+    async fetchRecipesByCreator(creatorId: number): Promise<Recipe[]> {
+        try {
+            const response = await axios.get(`${this.apiUrl}/creator/${creatorId}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error al obtener las recetas del creador", error);
+            throw error;
+        }
+    }
+
     async createRecipe(recipeData: RecetaFormData, creatorId: number): Promise<Recipe> {
         try {
             const response = await axios.post(this.apiUrl, {...recipeData, creatorId });
