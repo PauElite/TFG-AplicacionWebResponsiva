@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { userService } from "@/services/userService";
+import Link from "next/link";
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const { getUserById } = userService;
   const [username, setUsername] = useState<any>(null);
+  const [creatorId, setCreatorId] = useState<any>(null);
   const { id } = useParams(); // Obtener el ID de la URL dinámica
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function RecipeDetail() {
         if (recipe.data.creatorId) {
           const response = await getUserById(recipe.data.creatorId);
           setUsername(response.name);
+          setCreatorId(recipe.data.creatorId);
         }
 
       } catch (error) {
@@ -112,7 +115,15 @@ export default function RecipeDetail() {
             </div>
           ))}
         </div>
-        <h1 className="text-xs text-gray-800 text-right mb-4">Receta subida por: {username}</h1>
+        <h1 className="text-xs text-gray-800 text-right mb-4">
+          Receta subida por:{" "}
+          <Link
+            href={`/profile/${creatorId}`}  // Asegúrate de tener el userId disponible
+            className="text-green-300 hover:underline"
+          >
+            {username}
+          </Link>
+        </h1>
       </div>
     </div>
   );

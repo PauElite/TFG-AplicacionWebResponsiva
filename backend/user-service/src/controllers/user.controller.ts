@@ -335,7 +335,7 @@ export const getBasicUser = async (req: Request, res: Response, next: NextFuncti
         if (!user) {
             return next({ status: 404, message: "Usuario no encontrado" });
         }
-        res.status(200).json( { name: user.name, avatar: user.avatar } );
+        res.status(200).json( { id: user.id, name: user.name, avatar: user.avatar } );
     } catch (error) {
         next(error);
     }

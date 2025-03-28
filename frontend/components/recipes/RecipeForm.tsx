@@ -79,7 +79,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                 required
                             />
                         </div>
@@ -90,7 +90,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                 rows={3}
                                 required
                             />
@@ -104,7 +104,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                     name="prepTime"
                                     value={formData.prepTime}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                     min="0"
                                     required
                                 />
@@ -117,7 +117,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                     name="difficulty"
                                     value={formData.difficulty}
                                     onChange={handleChange}
-                                    className="flex-grow w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="flex-grow w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                     min="1"
                                     max="5"
                                     required
@@ -132,7 +132,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                 name="imageUrl"
                                 value={formData.imageUrl}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                 placeholder="https://ejemplo.com/imagen.jpg"
                             />
                         </div>
@@ -149,7 +149,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                 type="text"
                                 value={ingredient}
                                 onChange={(e) => handleIngredientChange(index, e.target.value)}
-                                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                 placeholder="Ej: 200g de pasta"
                                 required
                             />
@@ -168,7 +168,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                     <button
                         type="button"
                         onClick={addIngredient}
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        className="mt-2 px-4 py-2 bg-green-300 text-white rounded-lg hover:bg-green-200"
                     >
                         Añadir ingrediente
                     </button>
@@ -218,7 +218,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                     <button
                         type="button"
                         onClick={addInstruction}
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        className="mt-2 px-4 py-2 bg-green-300 text-white rounded-lg hover:bg-green-200"
                     >
                         Añadir paso
                     </button>
@@ -228,7 +228,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`px-6 py-3 ${loading ? 'bg-green-600' : 'bg-green-500 hover:bg-green-600'
+                        className={`px-6 py-3 ${loading ? 'bg-green-400' : 'bg-green-300 hover:bg-green-200'
                             } text-white rounded-lg font-medium flex flex-col items-center`}
                     >
                         {loading ? (

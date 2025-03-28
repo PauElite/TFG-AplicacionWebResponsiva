@@ -47,7 +47,7 @@ export default function RegisterPage() {
           className="block w-full p-2 border rounded mb-4 text-sm"
           placeholder="Contraseña"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full text-sm hover:bg-blue-600 transition">
+        <button type="submit" className="bg-green-300 text-white p-2 rounded w-full text-sm hover:bg-green-200 transition">
           Registrarse
         </button>
       </form>

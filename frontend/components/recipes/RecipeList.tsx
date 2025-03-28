@@ -48,7 +48,7 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
                     <div className="flex justify-between mt-auto">
                         <Link
                             href={`/recipes/${recipe.id}`}
-                            className="text-blue-500 mt-auto hover:underline"
+                            className="text-green-300 mt-auto hover:underline"
                         >
                             Ver receta
                         </Link>
@@ -64,7 +64,7 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
                     <button
                         onClick={loadMoreRecipes}
                         disabled={loading}
-                        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+                        className="bg-green-300 text-white px-6 py-2 rounded hover:bg-green-200 disabled:bg-green-100"
                     >
                         {loading ? 'Cargando...' : 'Mostrar más recetas'}
                     </button>

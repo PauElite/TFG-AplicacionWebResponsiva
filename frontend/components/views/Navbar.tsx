@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
+import { useTransition } from "react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -22,7 +23,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4 flex-wrap justify-center">
           {user ? (
             <>
-              <Link href="/profile" className="hover:underline">Perfil</Link>
+              <Link href={`/profile/${user.id}`} className="hover:underline">Perfil</Link>
               <button onClick={logout} className="hover:underline">Cerrar sesión</button>
 
             </>
