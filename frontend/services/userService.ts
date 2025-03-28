@@ -7,7 +7,7 @@ class UserService {
 
     async getUserById(userId: number): Promise<User> {
         try {
-            const response = await axios.get(`${API_URL}/${userId}/name`);
+            const response = await axios.get(`${API_URL}/${userId}`);
             return response.data;
         } catch (error) {
             console.error("Error al obtener el usuario", error);

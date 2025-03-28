@@ -15,7 +15,7 @@ export default function UserProfile() {
     const [loadingUser, setLoadingUser] = useState<boolean>(true);
     const { id } = useParams();
     const { recipes, loadingRecipes, error } = useGetRecipesByCreator(Number(id));
-    const { user } = useAuth();
+    const { user: currentUser } = useAuth();
 
     useEffect(() => {
         const loadUser = async () => {
@@ -55,8 +55,8 @@ export default function UserProfile() {
             {/* Sección de perfil */}
             <div className="mb-8">
                 <div className="flex flex-col items-center justify-between sm:flex-row sm:items-center mb-4">
+                    <div className="flex flex-col sm:flex-row items-center">
                     {/* Avatar del usuario */}
-                    <div className="flex items-center">
                     <img
                         src={`/avatares/${userData.avatar}.webp`}
                         alt={`Avatar de ${userData.name}`}
@@ -66,7 +66,7 @@ export default function UserProfile() {
                         {userData.name}
                     </h1>
                     </div>
-                    {user?.id === userData.id && (
+                    {currentUser?.id === userData.id && (
                         <Link
                             href="/profile/edit"
                             className="bg-green-300 hover:bg-green-200 text-white px-4 py-2 rounded-lg transition-colors"

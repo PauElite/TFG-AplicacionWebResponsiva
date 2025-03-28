@@ -6,7 +6,6 @@ import { useAuth } from '@/context/AuthContext';
 export const useCreateRecipe = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<boolean>(false);
     const { user } = useAuth();
 
     const createRecipe = async (recipe: RecetaFormData) => {
@@ -20,7 +19,6 @@ export const useCreateRecipe = () => {
             setError(null);
 
             const newRecipe = await recipeService.createRecipe(recipe, user.id);
-            setSuccess(true);
             return newRecipe;
         } catch (error) {
             setError("No se pudo crear la receta");

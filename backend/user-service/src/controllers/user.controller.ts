@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
-const ACCESS_TOKEN_EXPIRATION_MINUTES = 15;
+const ACCESS_TOKEN_EXPIRATION_MINUTES = 1;
 const MAX_FAILED_LOGIN_ATTEMPTS = 3;
 const LOCK_TIME_LOGIN_MINUTES = 1;
 const RESET_PASSWORD_EXPIRATION_MINUTES = 5;
@@ -328,14 +328,14 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 };
 
 
-export const getBasicUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { id } = req.params;
         const user = await userService.getUserById(Number(id));
         if (!user) {
             return next({ status: 404, message: "Usuario no encontrado" });
         }
-        res.status(200).json( { id: user.id, name: user.name, avatar: user.avatar } );
+        res.status(200).json( { id: user.id, name: user.name, avatar: user.avatar, bio: user.bio } );
     } catch (error) {
         next(error);
     }

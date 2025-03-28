@@ -53,4 +53,6 @@ export class User {
     @Column({default: "avatar1"})
     avatar!: string;
 
+    @Column({type: "text", default: "Amante de la cocina y la buena comida."})
+    bio!: string;
 }
