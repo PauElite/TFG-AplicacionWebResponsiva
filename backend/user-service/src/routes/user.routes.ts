@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from "express";
-import { registerUser, loginUser, getAllUsers, getUser, refreshAccessToken, logoutUser, resetPassword, forgotPassword, verifyEmail, resendVerificationEmail } from "../controllers/user.controller";
+import { registerUser, loginUser, getAllUsers, getUser, updateUser, refreshAccessToken, logoutUser, resetPassword, forgotPassword, verifyEmail, resendVerificationEmail } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
 
@@ -11,6 +11,7 @@ router.post("/resend-verification-email", resendVerificationEmail); //Endpoint p
 router.post("/login", loginUser); //Endpoint para iniciar sesión
 router.get("/", getAllUsers); //Endpoint para obtener todos los usuarios
 router.get("/:id", getUser); //Endpoint para obtener datos básicos de un usuario por ID
+router.put("/:id", authMiddleware, updateUser); //Endpoint para actualizar un usuario por ID, solo accesible si el usuario está autenticado
 router.get("/perfil", authMiddleware, (req: Request, res: Response) => {
     res.status(200).json({ mensaje: "Ruta protegida", usuario: req.user });
 }); //Endpoint para acceder al perfil habiendo iniciado sesión

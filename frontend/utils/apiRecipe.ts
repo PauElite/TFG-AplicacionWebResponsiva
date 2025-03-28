@@ -2,7 +2,7 @@ import axios from "axios";
 
 const RECIPES_API_URL = "http://localhost:3002/recetas"; // URL de tu backend de recetas
 
-export const apiRecipe = axios.create({
+const apiRecipeInstance = axios.create({
   baseURL: RECIPES_API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -14,7 +14,7 @@ export const apiRecipe = axios.create({
 const getAuthToken = () => localStorage.getItem("accessToken");
 
 // Interceptor para adjuntar el token en cada petición
-apiRecipe.interceptors.request.use(
+apiRecipeInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
     if (token) {
@@ -28,7 +28,7 @@ apiRecipe.interceptors.request.use(
 
 // Función para configurar interceptores de respuesta
 export const setupRecipeInterceptors = (logout: () => void) => {
-  apiRecipe.interceptors.response.use(
+  apiRecipeInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
@@ -52,7 +52,7 @@ export const setupRecipeInterceptors = (logout: () => void) => {
           originalRequest.headers = originalRequest.headers || {}; // Asegurar que headers no es undefined
           originalRequest.headers.Authorization = `Bearer ${data.tokenAcceso}`;
           
-          return apiRecipe(originalRequest);
+          return apiRecipeInstance(originalRequest);
         } catch (refreshError) {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
@@ -67,3 +67,5 @@ export const setupRecipeInterceptors = (logout: () => void) => {
     }
   );
 };
+
+export const apiRecipe = apiRecipeInstance;

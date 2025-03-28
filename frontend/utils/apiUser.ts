@@ -2,7 +2,7 @@ import axios from "axios";
 
 const USERS_API_URL = "http://localhost:3001/recetas/users";
 
-export const apiUser = axios.create({
+const apiUserInstance = axios.create({
   baseURL: USERS_API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -14,7 +14,7 @@ export const apiUser = axios.create({
 const getAuthToken = () => localStorage.getItem("accessToken");
 
 // Interceptor para adjuntar el token en cada petición
-apiUser.interceptors.request.use(
+apiUserInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
     if (token) {
@@ -28,7 +28,7 @@ apiUser.interceptors.request.use(
 
 // Función para configurar la instancia de Axios con el logout del contexto
 export const setupUserInterceptors = (logout: () => void) => {
-  apiUser.interceptors.response.use(
+  apiUserInstance.interceptors.response.use(
     (response) => response, // Si la respuesta es exitosa, devolverla tal cual
     async (error) => {
       const originalRequest = error.config;
@@ -45,7 +45,7 @@ export const setupUserInterceptors = (logout: () => void) => {
           if (!refreshToken) throw new Error("No hay token de refresco");
 
           // Enviar petición para renovar el token
-          const { data } = await apiUser.post("/refresh", { refreshToken });
+          const { data } = await apiUserInstance.post("/refresh", { refreshToken });
           console.log("✅ Nuevo token recibido:", data.tokenAcceso);
 
           // Guardar el nuevo token de acceso
@@ -55,7 +55,7 @@ export const setupUserInterceptors = (logout: () => void) => {
           originalRequest.headers = originalRequest.headers || {}; // Asegurar que headers no es undefined
           originalRequest.headers["Authorization"] = `Bearer ${data.tokenAcceso}`;
 
-          return apiUser(originalRequest);
+          return apiUserInstance(originalRequest);
         } catch (refreshError) {
           console.error("❌ Error al renovar el token:", refreshError);
           localStorage.removeItem("accessToken");
@@ -72,3 +72,5 @@ export const setupUserInterceptors = (logout: () => void) => {
     }
   );
 };
+
+export const apiUser = apiUserInstance;

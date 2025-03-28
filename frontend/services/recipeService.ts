@@ -1,4 +1,4 @@
-import axios from "axios";
+import { apiRecipe } from "@/utils/apiRecipe";
 import { RecetaFormData } from "../types/receta";
 
 interface Recipe {
@@ -22,7 +22,7 @@ class RecipeService {
 
     async fetchRecipes(): Promise<Recipe[]> {
         try {
-            const response = await axios.get(this.apiUrl);
+            const response = await apiRecipe.get(this.apiUrl);
             return response.data;
         } catch (error) {
             console.error("Error al obtener las recetas", error);
@@ -32,7 +32,7 @@ class RecipeService {
 
     async fetchRecipesByCreator(creatorId: number): Promise<Recipe[]> {
         try {
-            const response = await axios.get(`${this.apiUrl}/creator/${creatorId}`);
+            const response = await apiRecipe.get(`${this.apiUrl}/creator/${creatorId}`);
             return response.data;
         } catch (error) {
             console.error("Error al obtener las recetas del creador", error);
@@ -42,7 +42,7 @@ class RecipeService {
 
     async createRecipe(recipeData: RecetaFormData, creatorId: number): Promise<Recipe> {
         try {
-            const response = await axios.post(this.apiUrl, {...recipeData, creatorId });
+            const response = await apiRecipe.post(this.apiUrl, {...recipeData, creatorId });
             return response.data.newRecipe;
         } catch (error) {
             console.error("Error al crear la receta", error);
