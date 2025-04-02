@@ -10,15 +10,23 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await register(name, email, password);
-      alert("Registro exitoso. Verifica tu email.");
-      router.push("/login");
+      setSuccessMessage("Registro exitoso. Revisa tu correo para verificar tu cuenta.");
+      setErrorMessage("");
+
+      // Redirige tras unos segundos si quieres
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
     } catch (error: any) {
-      alert(error.message);
+      setErrorMessage(error.message);
+      setSuccessMessage("");
     }
   };
 
@@ -26,6 +34,21 @@ export default function RegisterPage() {
     <div className="flex flex-col items-center justify-center min-h-screen px-4">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
         <h2 className="text-2xl font-bold mb-4 text-center">Registro</h2>
+
+        {/* Mensaje de éxito */}
+        {successMessage && (
+          <div className="mb-4 text-sm text-green-700 bg-green-100 border border-green-300 px-3 py-2 rounded">
+            {successMessage}
+          </div>
+        )}
+
+        {/* Mensaje de error */}
+        {errorMessage && (
+          <div className="mb-4 text-sm text-red-700 bg-red-100 border border-red-300 px-3 py-2 rounded">
+            {errorMessage}
+          </div>
+        )}
+
         <input
           type="text"
           value={name}

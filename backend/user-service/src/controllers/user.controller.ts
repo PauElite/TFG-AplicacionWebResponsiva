@@ -45,7 +45,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
         await sendVerificationEmail(email, emailVerificationToken);
 
-        console.log(`Token de verificación de email -> ${emailVerificationToken}`);
+        console.log(`Verificación de email -> http://localhost:3000/verify-email?token=${emailVerificationToken}`);
 
         res.status(201).json({ mensaje: "Usuario registrado", usuario: newUser });
     } catch (error) {
