@@ -33,7 +33,7 @@ export default function UserProfile() {
         if (id) loadUser();
     }, [id]);
 
-    
+
     if (loadingUser) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">
@@ -51,29 +51,38 @@ export default function UserProfile() {
     }
 
     return (
-        <div className="p-4 md:p-6 lg:p-8">
+        <div className="min-h-screen flex flex-col p-4 md:p-6 lg:p-8">
             {/* Sección de perfil */}
-            <div className="mb-8">
+            <div className="mb-8 justify-center items-center flex flex-col">
                 <div className="flex flex-col items-center justify-between sm:flex-row sm:items-center mb-4">
                     <div className="flex flex-col sm:flex-row items-center">
-                    {/* Avatar del usuario */}
-                    <img
-                        src={`/avatares/${userData.avatar}.webp`}
-                        alt={`Avatar de ${userData.name}`}
-                        className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-35 lg:h-35 rounded-full object-cover border-2 border-gray-300"
-                    />
-                    <h1 className="text-xl sm:text-2xl font-bold mt-3 sm:mt-0 sm:ml-4 md:ml-6 lg:ml-8">
-                        {userData.name}
-                    </h1>
+                        {/* Avatar del usuario */}
+                        <img
+                            src={`/avatares/${userData.avatar}.webp`}
+                            alt={`Avatar de ${userData.name}`}
+                            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-35 lg:h-35 rounded-full object-cover border-2 border-gray-300"
+                        />
+                        <div className="flex flex-col sm:ml-4 md:ml-6 lg:ml-8 items-center text-center sm:text-left">
+                            {/* Nombre */}
+                            <h1 className="text-2xl font-extrabold mt-3 sm:mt-0">
+                                {userData.name}
+                            </h1>
+
+                            {userData.bio && (
+                                <p className="text-neutral-800 text-base sm:text-lg italic mt-2 max-w-md">
+                                    {userData.bio}
+                                </p>
+                            )}
+                            {currentUser?.id === userData.id && (
+                                <Link
+                                    href="/profile/edit"
+                                    className="bg-green-300 hover:bg-green-200 text-white mt-4 px-3 py-1 self-center rounded-lg transition-colors"
+                                >
+                                    Editar perfil
+                                </Link>
+                            )}
+                        </div>
                     </div>
-                    {currentUser?.id === userData.id && (
-                        <Link
-                            href="/profile/edit"
-                            className="bg-green-300 hover:bg-green-200 text-white px-4 py-2 rounded-lg transition-colors"
-                        >
-                            Editar perfil
-                        </Link>
-                    )}
                 </div>
             </div>
 

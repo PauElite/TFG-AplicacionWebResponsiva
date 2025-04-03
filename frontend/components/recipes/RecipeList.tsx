@@ -29,7 +29,7 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
     }
 
     if (recipes.length === 0) {
-        return <div className="text-center py-8">No hay recetas disponibles</div>;
+        return <div className="text-center py-8">Este usuario aún no ha publicado ninguna receta 🍽️</div>;
     }
 
     return (
