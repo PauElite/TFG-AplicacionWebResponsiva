@@ -1,10 +1,11 @@
 import express from "express";
 import { createRecipe, getRecipeById, updateRecipe, deleteRecipe, getAllRecipes, getRecipesByCreator } from "../controllers/recipe.controller";
+import { recipeUploads } from "../middlewares/uploadMedia.middleware";
 
 const router = express.Router();
 
 // Definir rutas
-router.post("/", createRecipe); // Endpoint para crear una receta
+router.post("/", recipeUploads, createRecipe); // Endpoint para crear una receta
 router.get("/:id", getRecipeById); // Endpoint para obtener una receta por ID
 router.put("/:id", updateRecipe); // Endpoint para actualizar una receta por ID
 router.delete("/:id", deleteRecipe); // Endpoint para eliminar una receta por ID

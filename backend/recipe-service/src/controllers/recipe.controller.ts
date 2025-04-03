@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { recipeService } from "../services/recipe.service";
 import Joi from "joi";
+import { MediaType } from "../models/recipe.model";
 
 const recipeSchema = Joi.object({
   title: Joi.string().required(),
@@ -9,12 +10,14 @@ const recipeSchema = Joi.object({
   instructions: Joi.array().items(
     Joi.object({
       title: Joi.string().required(),
-      description: Joi.string().required()
+      description: Joi.string().required(),
+      mediaUrl: Joi.string().uri().optional(),
+      mediaType: Joi.string().valid(...Object.values(MediaType)).optional()
     })
   ).required(),
   prepTime: Joi.number().min(1).required(),
   difficulty: Joi.number().valid(1, 2, 3, 4, 5).required(),
-  imageUrl: Joi.string().uri().required(),
+  imageUrl: Joi.string().uri().optional(),
   creatorId: Joi.number().required()
 });
 
@@ -23,16 +26,41 @@ const updateRecipeSchema = recipeSchema.fork(
   (schema) => schema.optional()
 );
 
+
 // Crear una receta
 export const createRecipe = async (req: Request, res: Response, next: NextFunction) => {
-  const { error } = recipeSchema.validate(req.body);
-
+  const data = JSON.parse(req.body.data);
+  const { error } = recipeSchema.validate(data);
   if (error) {
     return next({ status: 400, message: error.details[0].message });
   }
 
   try {
-    const { title, description, ingredients, instructions, prepTime, difficulty, imageUrl, creatorId } = req.body;
+    let imageUrl = data.imageUrl;
+
+    if (req.files && "imageFile" in req.files && req.files["imageFile"][0]) {
+      const file = req.files["imageFile"][0];
+      imageUrl = `/uploads/${file.filename}`;
+    }
+
+    if (!imageUrl) {
+      return next({ status: 400, message: "Se requiere una imagen para la receta" });
+    }
+
+    const stepFiles = (req.files && "stepFiles" in req.files) ? req.files["stepFiles"] : [];
+    const instructions = data.instructions.map((step: any, index: number) => {
+      const file = stepFiles[index];
+      if (file) {
+        return {
+          ...step,
+          mediaUrl: `/uploads/${file.filename}`,
+          mediaType: file.mimetype.startsWith("video") ? "video" : "image"
+        };
+      }
+      return step;
+    });
+
+    const { title, description, ingredients, prepTime, difficulty, creatorId } = data;
     const newRecipe = await recipeService.createRecipe(title, description, ingredients, instructions, prepTime, difficulty, imageUrl, creatorId);
     
     res.status(201).json({ message: "Receta creada con éxito", newRecipe });

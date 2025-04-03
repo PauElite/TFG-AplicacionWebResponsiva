@@ -4,6 +4,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import recipeRoutes from "./routes/recipe.routes";
 import { errorHandler } from "./middlewares/error.middleware";
+import path from "path";
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ app.use("/recetas", recipeRoutes);
 
 // Middleware de manejo de errores
 app.use(errorHandler);
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`✅ Servidor Recetas corriendo en http://localhost:${PORT}`));

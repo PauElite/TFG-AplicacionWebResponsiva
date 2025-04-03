@@ -1,9 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column, Check, ManyToOne } from "typeorm";
 
+export enum MediaType {
+  IMAGE = "image",
+  VIDEO = "video",
+}
+
 // Definir la interfaz para un paso
 interface Paso {
   title: string;
   description: string;
+  mediaUrl?: string;
+  mediaType?: MediaType;
 }
 
 @Entity()
@@ -32,10 +39,10 @@ export class Recipe {
     length: 1,  // Limitar la longitud a 1 carácter
   })
   @Check(`"difficulty" BETWEEN '1' AND '5'`)  // Restricción de valor entre 1 y 5
-  difficulty?: string;
+  difficulty!: string;
 
   @Column({ type: "varchar"})
-  imageUrl?: string;
+  imageUrl!: string;
 
   @Column({ nullable: true })
   creatorId!: number;
