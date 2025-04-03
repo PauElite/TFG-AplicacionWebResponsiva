@@ -1,5 +1,5 @@
 import { apiUser } from "@/utils/apiUser";
-import { User } from "@/types/user";
+import { User } from "../../shared/models/user";
 
 const API_URL = "http://localhost:3001/recetas/users";
 

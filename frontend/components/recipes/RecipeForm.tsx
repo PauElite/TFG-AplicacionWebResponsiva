@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { RecetaFormData, PasoInstruccion } from "@/types/receta";
+import type { RecetaFormData } from "@/types/receta"
+import type { Step } from "../../../shared/models/recipe";
 import { BurgerLoadingAnimation } from "@/components/views/loading/BurgerLoadingAnimation";
 
 interface RecipeFormProps {
@@ -15,7 +16,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
         ingredients: [""],
         instructions: [{ title: "", description: "" }],
         prepTime: 0,
-        difficulty: 1,
+        difficulty: "1",
         imageUrl: ""
     });
 
@@ -44,7 +45,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
         setFormData(prev => ({ ...prev, ingredients: newIngredients }));
     };
 
-    const handleInstructionChange = (index: number, field: keyof PasoInstruccion, value: string) => {
+    const handleInstructionChange = (index: number, field: keyof Step, value: string) => {
         const newInstructions = [...formData.instructions];
         newInstructions[index] = { ...newInstructions[index], [field]: value };
         setFormData(prev => ({ ...prev, instructions: newInstructions }));
@@ -136,6 +137,22 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                 placeholder="https://ejemplo.com/imagen.jpg"
                             />
                         </div>
+                        <div>
+                            <label className="block text-gray-700 mb-2">Imagen desde tu ordenador</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    if (e.target.files?.[0]) {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            imageFile: e.target.files![0],
+                                            imageUrl: "" // vacía la URL si sube archivo
+                                        }));
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -168,7 +185,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                     <button
                         type="button"
                         onClick={addIngredient}
-                        className="mt-2 px-4 py-2 bg-green-300 text-white rounded-lg hover:bg-green-200"
+                        className="mt-2 px-4 py-2 bg-[#8b5e3c] hover:bg-[#a66b47c4] text-white rounded-lg "
                     >
                         Añadir ingrediente
                     </button>
@@ -202,6 +219,42 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                     required
                                 />
                             </div>
+                            {/* Campo para URL de vídeo */}
+                            <div className="mb-2">
+                                <label className="block text-gray-700 mb-1">Vídeo (URL de YouTube, Vimeo, etc.)</label>
+                                <input
+                                    type="url"
+                                    value={step.mediaUrl || ""}
+                                    onChange={(e) => {
+                                        handleInstructionChange(index, "mediaUrl", e.target.value);
+                                        if (step.mediaType !== "video") {
+                                            handleInstructionChange(index, "mediaType", "video");
+                                        }
+                                    }}
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="https://youtube.com/..."
+                                />
+                            </div>
+
+                            {/* Campo para subir imagen local */}
+                            <div className="mb-2">
+                                <label className="block text-gray-700 mb-1">Imagen (archivo local)</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        setFormData(prev => {
+                                            const newInstructions = [...prev.instructions];
+                                            newInstructions[index].file = file;
+                                            newInstructions[index].mediaType = "image";
+                                            newInstructions[index].mediaUrl = ""; // limpiamos si se sube imagen
+                                            return { ...prev, instructions: newInstructions };
+                                        });
+                                    }}
+                                />
+                            </div>
+
 
                             {formData.instructions.length > 1 && (
                                 <button
@@ -218,7 +271,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                     <button
                         type="button"
                         onClick={addInstruction}
-                        className="mt-2 px-4 py-2 bg-green-300 text-white rounded-lg hover:bg-green-200"
+                        className="mt-2 px-4 py-2 bg-[#8b5e3c] hover:bg-[#a66b47c4] text-white rounded-lg "
                     >
                         Añadir paso
                     </button>
@@ -228,7 +281,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`px-6 py-3 ${loading ? 'bg-green-400' : 'bg-green-300 hover:bg-green-200'
+                        className={`px-6 py-3 ${loading ? 'bg-[#795234]' : 'bg-[#8b5e3c] hover:bg-[#a66b47c4]'
                             } text-white rounded-lg font-medium flex flex-col items-center`}
                     >
                         {loading ? (
@@ -239,7 +292,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                             'Publicar receta'
                         )}
                     </button>
-                        {loading && <BurgerLoadingAnimation />}
+                    {loading && <BurgerLoadingAnimation />}
                 </div>
             </form>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { User } from "@/types/user";
+import { User } from "../../../../shared/models/user";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { userService } from "@/services/userService";
@@ -124,7 +124,7 @@ export default function ProfileEditPage() {
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        className="px-4 py-2 bg-[#8b5e3c] hover:bg-[#a66b47c4] text-white rounded-lg  transition-colors"
                     >
                         Guardar Cambios
                     </button>

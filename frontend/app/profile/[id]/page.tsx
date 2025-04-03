@@ -1,7 +1,7 @@
 "use client";
 
 import { RecipeList } from "@/components/recipes/RecipeList";
-import { User } from "@/types/user";
+import { User } from "../../../../shared/models/user";
 import { userService } from "@/services/userService";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -76,7 +76,7 @@ export default function UserProfile() {
                             {currentUser?.id === userData.id && (
                                 <Link
                                     href="/profile/edit"
-                                    className="bg-green-300 hover:bg-green-200 text-white mt-4 px-3 py-1 self-center rounded-lg transition-colors"
+                                    className="bg-[#8b5e3c] hover:bg-[#a66b47c4] text-white mt-4 px-3 py-1 self-center rounded-lg transition-colors"
                                 >
                                     Editar perfil
                                 </Link>

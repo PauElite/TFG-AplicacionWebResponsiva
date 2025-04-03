@@ -10,7 +10,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Middleware para receta + archivos de pasos
-export const recipeUploads = upload.fields([
+/*export const recipeUploads = upload.fields([
   { name: "imageFile", maxCount: 1 },
-  { name: "stepFiles"}
-]);
+  { name: "stepFiles", maxCount: 20}
+]);*/
+
+export const recipeUploads = upload.any();

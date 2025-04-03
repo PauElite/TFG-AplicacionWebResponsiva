@@ -29,25 +29,37 @@ const updateRecipeSchema = recipeSchema.fork(
 
 // Crear una receta
 export const createRecipe = async (req: Request, res: Response, next: NextFunction) => {
-  const data = JSON.parse(req.body.data);
-  const { error } = recipeSchema.validate(data);
-  if (error) {
-    return next({ status: 400, message: error.details[0].message });
-  }
-
   try {
-    let imageUrl = data.imageUrl;
+    const rawData = req.body.data;
+    if (!rawData) {
+      return next({ status: 400, message: "Falta el campo 'data'" });
+    }
 
-    if (req.files && "imageFile" in req.files && req.files["imageFile"][0]) {
-      const file = req.files["imageFile"][0];
-      imageUrl = `/uploads/${file.filename}`;
+    const data = JSON.parse(rawData);
+    const { error } = recipeSchema.validate(data);
+    if (error) {
+      return next({ status: 400, message: error.details[0].message });
+    }
+
+    // Obtener imagen principal
+    let imageUrl = data.imageUrl;
+    const imageFile = Array.isArray(req.files) 
+      ? req.files.find((file: any) => file.fieldname === "imageFile")
+      : req.files?.["imageFile"]?.[0];
+
+    if (imageFile) {
+      imageUrl = `/uploads/${imageFile.filename}`;
     }
 
     if (!imageUrl) {
       return next({ status: 400, message: "Se requiere una imagen para la receta" });
     }
 
-    const stepFiles = (req.files && "stepFiles" in req.files) ? req.files["stepFiles"] : [];
+    // Obtener archivos por paso
+    const stepFiles = Array.isArray(req.files)
+      ? req.files.filter((file: any) => file.fieldname === "stepFiles")
+      : req.files?.["stepFiles"] ?? [];
+
     const instructions = data.instructions.map((step: any, index: number) => {
       const file = stepFiles[index];
       if (file) {
@@ -61,11 +73,22 @@ export const createRecipe = async (req: Request, res: Response, next: NextFuncti
     });
 
     const { title, description, ingredients, prepTime, difficulty, creatorId } = data;
-    const newRecipe = await recipeService.createRecipe(title, description, ingredients, instructions, prepTime, difficulty, imageUrl, creatorId);
-    
+
+    const newRecipe = await recipeService.createRecipe(
+      title,
+      description,
+      ingredients,
+      instructions,
+      prepTime,
+      difficulty,
+      imageUrl,
+      creatorId
+    );
+
     res.status(201).json({ message: "Receta creada con éxito", newRecipe });
+
   } catch (error) {
-    console.error("Error al crear la receta", error);
+    console.error("❌ Error al crear la receta", error);
     next(error);
   }
 };

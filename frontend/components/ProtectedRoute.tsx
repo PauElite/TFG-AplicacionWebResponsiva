@@ -50,7 +50,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
           <p className="text-gray-600">Debes iniciar sesión para acceder a esta página.</p>
           <Link
             href="/login"
-            className="inline-block bg-green-300 text-white px-5 py-2 rounded hover:bg-green-200 transition-colors"
+            className="inline-block bg-[#8b5e3c] hover:bg-[#a66b47c4] text-white px-5 py-2 rounded  transition-colors"
           >
             Iniciar sesión
           </Link>

@@ -125,7 +125,7 @@ export default function VerifyEmailPage() {
                         <button
                             onClick={handleResend}
                             disabled={loadingResend}
-                            className={`bg-green-500 text-white px-4 py-2 rounded text-sm transition flex items-center justify-center w-full ${loadingResend ? "opacity-70 cursor-not-allowed" : "hover:bg-green-600"
+                            className={`bg-[#8b5e3c] text-white px-4 py-2 rounded text-sm transition flex items-center justify-center w-full ${loadingResend ? "opacity-70 cursor-not-allowed" : "hover:bg-[#a66b47c4]"
                                 }`}
                         >
                             {loadingResend ? (

@@ -1,8 +1,9 @@
-export interface Paso {
+export interface Step {
     title: string;
     description: string;
     mediaUrl?: string;
     mediaType?: "image" | "video";
+    file?: File | null;
   }
   
   export interface Recipe {
@@ -10,10 +11,11 @@ export interface Paso {
     title: string;
     description: string;
     ingredients: string[];
-    instructions: Paso[];
+    instructions: Step[];
     prepTime: number;
     difficulty: string;
-    imageUrl: string;
+    imageUrl?: string;
     creatorId: number;
+    imageFile?: File;
   }
   

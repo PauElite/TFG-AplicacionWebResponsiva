@@ -6,7 +6,7 @@ export enum MediaType {
 }
 
 // Definir la interfaz para un paso
-interface Paso {
+interface Step {
   title: string;
   description: string;
   mediaUrl?: string;
@@ -28,7 +28,7 @@ export class Recipe {
   ingredients!: string[];
 
   @Column("jsonb")
-  instructions!: Paso[]; // Array de objetos tipo "Paso"
+  instructions!: Step[]; // Array de objetos tipo "Paso"
 
   @Column("int")
   prepTime!: number;

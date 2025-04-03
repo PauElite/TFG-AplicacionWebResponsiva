@@ -5,20 +5,17 @@ import Navbar from "../components/views/Navbar";
 import Footer from "../components/views/Footer";
 
 export const metadata: Metadata = {
-  title: "Mi Aplicación",
-  description: "Aplicación con autenticación en Next.js y Express",
+  title: "El Fogón Rebelde",
+  description: "Aplicación para compartir recetas de cocina"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className="bg-gray-100 text-gray-900 min-h-screen bg-cover bg-fixed bg-center flex flex-col"
-        style={{
-          backgroundImage: "url('https://static.vecteezy.com/system/resources/previews/020/919/511/non_2x/seamless-texture-with-of-hand-drawn-kitchen-utensils-can-be-used-for-wallpaper-pattern-fills-textile-web-page-background-surface-textures-illustration-kitchen-pattern-vector.jpg')",
-        }}>
+      <body className=" text-gray-900 min-h-screen flex flex-col">
         <AuthProvider>
           <Navbar />
-          <main className="flex-grow container mx-auto px-4 pt-20 pb-8 flex items-center justify-center">{children}</main>
+          <main className="bg-[#e0f2e9] flex-grow container mx-auto px-4 pt-20 pb-8 flex items-center justify-center">{children}</main>
           <Footer />
         </AuthProvider>
       </body>

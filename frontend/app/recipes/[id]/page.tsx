@@ -33,21 +33,6 @@ export default function RecipeDetail() {
       } finally {
         setLoading(false);
       }
-      /*if (id) {
-        // Obtener los detalles de la receta
-        axios
-          .get(`http://localhost:3002/recetas/${id}`)
-          .then((response) => {
-            setRecipe(response.data);
-            setUser(getUserById(recipe.creatorId));
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.error("Error al obtener la receta:", error);
-            setLoading(false);
-          });
-          
-      }*/
     }
 
     loadRecipe();
@@ -69,6 +54,32 @@ export default function RecipeDetail() {
     );
   }
 
+  const getEmbedMedia = (url: string): { embedUrl: string; platform: "youtube" | "vimeo" | "other" } => {
+    // YouTube (watch?v=...)
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+    if (youtubeMatch) {
+      return {
+        embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
+        platform: "youtube"
+      };
+    }
+  
+    // Vimeo (vimeo.com/123456)
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) {
+      return {
+        embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+        platform: "vimeo"
+      };
+    }
+  
+    // Otras URLs (videos locales o de otro servidor)
+    return {
+      embedUrl: url,
+      platform: "other"
+    };
+  };
+
   // Función para renderizar las zanahorias llenas y vacías según la dificultad
   const renderDifficulty = (difficulty: number) => {
     const carrots = [];  // Un array para contener las zanahorias
@@ -85,7 +96,11 @@ export default function RecipeDetail() {
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 py-8">
       <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg space-y-6">
-        <img src={recipe.imageUrl} alt={recipe.title} className="w-full max-w-3xl h-64 object-cover rounded-xl mb-6" />
+        <img
+          src={`http://localhost:3002${recipe.imageUrl}`}
+          alt={recipe.title}
+          className="w-full max-w-3xl h-64 object-cover rounded-xl mb-6"
+        />
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4">{recipe.title}</h1>
         <p className="text-gray-600 text-center mb-6 px-2 max-w-2xl">{recipe.description}</p>
         <div className="flex flex-wrap justify-between items-center gap-4 text-center">
@@ -107,19 +122,57 @@ export default function RecipeDetail() {
         </ul>
 
         <h2 className="text-2xl font-bold mb-4">Instrucciones</h2>
-        <div className="space-y-6 mb-6">
-          {recipe.instructions.map((step: { title: string, description: string }, index: number) => (
+        <div className="space-y-16 mb-6">
+
+          {recipe.instructions.map((step: any, index: number) => (
             <div key={index}>
               <h3 className="text-lg font-semibold text-gray-800">{step.title}</h3>
-              <p className="text-sm text-gray-600">{step.description}</p>
+              <p className="text-sm text-gray-600 mb-2">{step.description}</p>
+
+              {step.mediaUrl && step.mediaType === "image" && (
+                <img
+                  src={`http://localhost:3002${step.mediaUrl}`}
+                  alt={`Paso ${index + 1}`}
+                  className="w-full max-w-md h-auto rounded-lg mb-4"
+                />
+              )}
+
+{step.mediaUrl && step.mediaType === "video" && (() => {
+  const { embedUrl, platform } = getEmbedMedia(step.mediaUrl);
+
+  if (platform === "youtube" || platform === "vimeo") {
+    return (
+      <iframe
+        src={embedUrl}
+        className="w-full max-w-md h-64 rounded-lg mb-4"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    );
+  }
+
+  return (
+    <video
+      controls
+      src={embedUrl}
+      className="w-full max-w-md h-auto rounded-lg mb-4"
+    >
+      Tu navegador no admite el tag de video.
+    </video>
+  );
+})()}
+
+
             </div>
           ))}
+
         </div>
         <h1 className="text-xs text-gray-800 text-right mb-4">
           Receta subida por:{" "}
           <Link
             href={`/profile/${creatorId}`}  // Asegúrate de tener el userId disponible
-            className="text-green-300 hover:underline"
+            className="text-[#8b5e3c] hover:underline"
           >
             {username}
           </Link>

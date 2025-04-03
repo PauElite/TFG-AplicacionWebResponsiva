@@ -1,14 +1,4 @@
-export type PasoInstruccion = {
-  title: string;
-  description: string;
-};
+import type { Recipe } from "../../shared/models/recipe";
+import type { Step } from "../../shared/models/recipe";
 
-export type RecetaFormData = {
-  title: string;
-  description: string;
-  ingredients: string[];
-  instructions: PasoInstruccion[];
-  prepTime: number;
-  difficulty: number;
-  imageUrl: string;
-};
+export type RecetaFormData = Omit<Recipe, "id" | "creatorId">;
