@@ -63,7 +63,7 @@ export default function RecipeDetail() {
         platform: "youtube"
       };
     }
-  
+
     // Vimeo (vimeo.com/123456)
     const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
     if (vimeoMatch) {
@@ -72,12 +72,24 @@ export default function RecipeDetail() {
         platform: "vimeo"
       };
     }
-  
+
     // Otras URLs (videos locales o de otro servidor)
     return {
       embedUrl: url,
       platform: "other"
     };
+  };
+
+  // Función para obtener la URL de la imagen
+  // (si es una URL externa o una ruta del backend)
+  const getImageSrc = (url: string) => {
+    // Si empieza por http o https, es una URL externa → usarla tal cual
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+
+    // Si no, asumimos que es una ruta del backend (por ejemplo: /uploads/...)
+    return `http://localhost:3002${url}`;
   };
 
   // Función para renderizar las zanahorias llenas y vacías según la dificultad
@@ -97,12 +109,45 @@ export default function RecipeDetail() {
     <div className="flex flex-col items-center justify-start min-h-screen px-4 py-8">
       <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg space-y-6">
         <img
-          src={`http://localhost:3002${recipe.imageUrl}`}
+          src={getImageSrc(recipe.imageUrl)}
           alt={recipe.title}
-          className="w-full max-w-3xl h-64 object-cover rounded-xl mb-6"
+          className="w-full h-48 object-cover rounded mb-4"
         />
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4">{recipe.title}</h1>
         <p className="text-gray-600 text-center mb-6 px-2 max-w-2xl">{recipe.description}</p>
+        {recipe.suitableFor?.length > 0 && (
+          <div className="flex justify-center gap-4 items-center mb-6">
+            {recipe.suitableFor.includes("airfrier") && (
+              <Link
+                href={{ pathname: "/", query: { suitableFor: "airfrier" } }}
+                className="group flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg shadow-sm transition-shadow duration-200 hover:shadow-md hover:bg-gray-50 cursor-pointer"
+              >
+                <img
+                  src="https://img.icons8.com/external-filled-line-andi-nur-abdillah/64/external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah.png"
+                  alt="AirFrier"
+                  className="w-7 h-7 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"
+                />
+                <span className="text-sm font-medium text-gray-700">AirFrier</span>
+              </Link>
+            )}
+
+            {recipe.suitableFor.includes("horno") && (
+              <Link
+                href={{ pathname: "/", query: { suitableFor: "horno" } }}
+                className="group flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg shadow-sm transition-shadow duration-200 hover:shadow-md hover:bg-gray-50 cursor-pointer"
+              >
+                <img
+                  src="https://img.icons8.com/external-kiranshastry-lineal-color-kiranshastry/64/external-oven-kitchen-kiranshastry-lineal-color-kiranshastry.png"
+                  alt="Horno"
+                  className="w-7 h-7 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"
+                />
+                <span className="text-sm font-medium text-gray-700">Horno</span>
+              </Link>
+            )}
+          </div>
+        )}
+
+
         <div className="flex flex-wrap justify-between items-center gap-4 text-center">
           <div className="text-gray-800">
             <span className="font-semibold">Tiempo de preparación:</span> {recipe.prepTime} min
@@ -122,7 +167,7 @@ export default function RecipeDetail() {
         </ul>
 
         <h2 className="text-2xl font-bold mb-4">Instrucciones</h2>
-        <div className="space-y-16 mb-6">
+        <div className="space-y-8 mb-6">
 
           {recipe.instructions.map((step: any, index: number) => (
             <div key={index}>
@@ -137,31 +182,31 @@ export default function RecipeDetail() {
                 />
               )}
 
-{step.mediaUrl && step.mediaType === "video" && (() => {
-  const { embedUrl, platform } = getEmbedMedia(step.mediaUrl);
+              {step.mediaUrl && step.mediaType === "video" && (() => {
+                const { embedUrl, platform } = getEmbedMedia(step.mediaUrl);
 
-  if (platform === "youtube" || platform === "vimeo") {
-    return (
-      <iframe
-        src={embedUrl}
-        className="w-full max-w-md h-64 rounded-lg mb-4"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
-    );
-  }
+                if (platform === "youtube" || platform === "vimeo") {
+                  return (
+                    <iframe
+                      src={embedUrl}
+                      className="w-full max-w-md h-64 rounded-lg mb-4"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  );
+                }
 
-  return (
-    <video
-      controls
-      src={embedUrl}
-      className="w-full max-w-md h-auto rounded-lg mb-4"
-    >
-      Tu navegador no admite el tag de video.
-    </video>
-  );
-})()}
+                return (
+                  <video
+                    controls
+                    src={embedUrl}
+                    className="w-full max-w-md h-auto rounded-lg mb-4"
+                  >
+                    Tu navegador no admite el tag de video.
+                  </video>
+                );
+              })()}
 
 
             </div>

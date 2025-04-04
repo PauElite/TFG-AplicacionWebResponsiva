@@ -1,25 +1,26 @@
 import { useState, useEffect } from 'react';
 import { recipeService } from '@/services/recipeService';
 
-export const useGetAllRecipes = () => {
+export const useGetAllRecipes = (suitableFor?: string[]) => {
     const [recipes, setRecipes] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
+  
     useEffect(() => {
-        const loadAllRecipes = async () => {
+      const loadAllRecipes = async () => {
         try {
-            const data = await recipeService.fetchRecipes();
-            setRecipes(data);
+          const data = await recipeService.fetchRecipes(suitableFor);
+          setRecipes(data);
         } catch (error) {
-            setError("No se pudieron cargar las recetas");
+          setError("No se pudieron cargar las recetas");
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
-        
-        loadAllRecipes();
-    }, []);
-
-    return { recipes, loading, error, reloadAllRecipes: useGetAllRecipes };
-};
+      };
+  
+      loadAllRecipes();
+    }, [suitableFor?.join(",")]);
+  
+    return { recipes, loading, error };
+  };
+  

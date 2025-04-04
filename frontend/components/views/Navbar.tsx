@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "../../context/AuthContext";
-import { useTransition } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();

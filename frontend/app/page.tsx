@@ -3,9 +3,14 @@
 import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
 import { RecipeList } from "@/components/recipes/RecipeList";
 import { BurgerLoadingAnimation } from "@/components/views/loading/BurgerLoadingAnimation";
+import { RecipeFilter } from "@/components/recipes/RecipeFilter";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
-  const { recipes, loading, error } = useGetAllRecipes();
+  const searchParams = useSearchParams();
+  const suitableFor = searchParams.getAll("suitableFor");
+  const { recipes, loading, error } = useGetAllRecipes(suitableFor.length > 0 ? suitableFor : undefined);
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -16,7 +21,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center min-h-screen px-4 py-8">
-      
+      <RecipeFilter />
       {loading ? (
         <div className="flex flex-col items-center justify-center h-screen">
           <BurgerLoadingAnimation />

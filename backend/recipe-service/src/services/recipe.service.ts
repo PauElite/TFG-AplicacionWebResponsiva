@@ -11,13 +11,14 @@ export class RecipeService {
 
   // Crear una receta
   async createRecipe(title: string, description: string, ingredients: string[], 
-    instructions: any[], prepTime: number, difficulty: string, imageUrl: string, creatorId: number): Promise<Recipe> {
+    instructions: any[], prepTime: number, suitableFor: string[], difficulty: string, imageUrl: string, creatorId: number): Promise<Recipe> {
     const newRecipe = this.recipeRepository.create({
       title,
       description,
       ingredients,
       instructions,
       prepTime,
+      suitableFor,
       difficulty,
       imageUrl,
       creatorId
@@ -33,9 +34,26 @@ export class RecipeService {
   }
 
   // Obtener todas las recetas
-  async getAllRecipes(): Promise<Recipe[]> {
-    return await this.recipeRepository.find();
+  // Si se proporciona un parámetro suitableFor, filtra las recetas por ese valor
+  async getAllRecipes(suitableFor?: string[]): Promise<Recipe[]> {
+    const query = this.recipeRepository.createQueryBuilder("recipe");
+  
+    if (suitableFor && suitableFor.length > 0) {
+      // Genera condiciones del tipo: 'airfrier' = ANY(recipe.suitableFor)
+      suitableFor.forEach((value, index) => {
+        const param = `value${index}`;
+        const condition = `:${param} = ANY(recipe.suitableFor)`;
+        if (index === 0) {
+          query.where(condition, { [param]: value });
+        } else {
+          query.orWhere(condition, { [param]: value });
+        }
+      });
+    }
+  
+    return await query.getMany();
   }
+  
 
   // Obtener una receta por ID
   async getRecipeById(id: number): Promise<Recipe | null> {

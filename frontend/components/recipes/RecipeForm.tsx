@@ -16,6 +16,7 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
         ingredients: [""],
         instructions: [{ title: "", description: "" }],
         prepTime: 0,
+        suitableFor: [],
         difficulty: "1",
         imageUrl: ""
     });
@@ -124,6 +125,51 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                     required
                                 />
                             </div>
+                            <div>
+                                <label className="block text-gray-700 mb-2">¿Para qué dispositivos es apta?</label>
+                                <div className="flex flex-col gap-2">
+                                    <label className="inline-flex items-center gap-2 group cursor-pointer p-2 rounded-md transition-shadow duration-200 hover:shadow-md hover:bg-gray-50">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.suitableFor?.includes("airfrier") || false}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    suitableFor: checked
+                                                        ? [...(prev.suitableFor || []), "airfrier"]
+                                                        : (prev.suitableFor || []).filter((val) => val !== "airfrier"),
+                                                }));
+                                            }}
+                                        />
+                                        <img width="32" height="32" src="https://img.icons8.com/external-filled-line-andi-nur-abdillah/64/external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah.png" 
+                                        alt="external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah" 
+                                        className="w-8 h-8 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"/>
+                                        <span>AirFrier</span>
+                                    </label>
+
+                                    <label className="inline-flex items-center gap-2 group cursor-pointer p-2 rounded-md transition-shadow duration-200 hover:shadow-md hover:bg-gray-50">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.suitableFor?.includes("horno") || false}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    suitableFor: checked
+                                                        ? [...(prev.suitableFor || []), "horno"]
+                                                        : (prev.suitableFor || []).filter((val) => val !== "horno"),
+                                                }));
+                                            }}
+                                        />
+                                        <img width="32" height="32" src="https://img.icons8.com/external-kiranshastry-lineal-color-kiranshastry/64/external-oven-kitchen-kiranshastry-lineal-color-kiranshastry.png" 
+                                        alt="external-oven-kitchen-kiranshastry-lineal-color-kiranshastry"
+                                        className="w-8 h-8 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"/>
+                                        <span>Horno</span>
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
 
                         <div>

@@ -36,10 +36,10 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
       
         // Si no, asumimos que es una ruta del backend (por ejemplo: /uploads/...)
         return `http://localhost:3002${url}`;
-      };
+    };
 
     if (recipes.length === 0) {
-        return <div className="text-center py-8">Este usuario aún no ha publicado ninguna receta 🍽️</div>;
+        return <div className="text-center py-8">No se han encontrado recetas</div>;
     }
 
     return (

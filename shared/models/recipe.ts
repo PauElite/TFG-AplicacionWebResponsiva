@@ -13,6 +13,7 @@ export interface Step {
     ingredients: string[];
     instructions: Step[];
     prepTime: number;
+    suitableFor?: ("airfrier" | "horno")[];
     difficulty: string;
     imageUrl?: string;
     creatorId: number;

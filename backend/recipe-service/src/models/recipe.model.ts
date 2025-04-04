@@ -33,6 +33,9 @@ export class Recipe {
   @Column("int")
   prepTime!: number;
 
+  @Column("text", { array: true, nullable: true })
+  suitableFor?: string[]; // ["airfrier", "horno"]
+
   @Column({ 
     type: "varchar", 
     nullable: true, 

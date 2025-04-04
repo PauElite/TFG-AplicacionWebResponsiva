@@ -16,6 +16,7 @@ const recipeSchema = Joi.object({
     })
   ).required(),
   prepTime: Joi.number().min(1).required(),
+  suitableFor: Joi.array().items(Joi.string().valid("airfrier", "horno")).optional(),
   difficulty: Joi.number().valid(1, 2, 3, 4, 5).required(),
   imageUrl: Joi.string().uri().optional(),
   creatorId: Joi.number().required()
@@ -72,7 +73,7 @@ export const createRecipe = async (req: Request, res: Response, next: NextFuncti
       return step;
     });
 
-    const { title, description, ingredients, prepTime, difficulty, creatorId } = data;
+    const { title, description, ingredients, prepTime, suitableFor, difficulty, creatorId } = data;
 
     const newRecipe = await recipeService.createRecipe(
       title,
@@ -80,6 +81,7 @@ export const createRecipe = async (req: Request, res: Response, next: NextFuncti
       ingredients,
       instructions,
       prepTime,
+      suitableFor ?? [],
       difficulty,
       imageUrl,
       creatorId
@@ -156,15 +158,28 @@ export const deleteRecipe = async (req: Request, res: Response, next: NextFuncti
 }
 
 // Obtener todas las recetas
+import { ParsedQs } from "qs";
+
 export const getAllRecipes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const recipes = await recipeService.getAllRecipes();
+    const suitableForQuery = req.query.suitableFor;
+
+    const suitableFor: string[] | undefined = Array.isArray(suitableForQuery)
+      ? suitableForQuery.map(String)
+      : suitableForQuery
+        ? [String(suitableForQuery)]
+        : undefined;
+
+    const recipes = await recipeService.getAllRecipes(suitableFor);
     res.status(200).json(recipes);
   } catch (error) {
     console.error("Error al obtener las recetas", error);
     next(error);
   }
 };
+
+
+
 
 // Obtener recetas por ID de creador
 export const getRecipesByCreator = async (req: Request, res: Response, next: NextFunction) => {
