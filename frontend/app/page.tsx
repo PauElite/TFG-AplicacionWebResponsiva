@@ -9,7 +9,10 @@ import { useSearchParams } from "next/navigation";
 export default function Home() {
   const searchParams = useSearchParams();
   const suitableFor = searchParams.getAll("suitableFor");
-  const { recipes, loading, error } = useGetAllRecipes(suitableFor.length > 0 ? suitableFor : undefined);
+  const search = searchParams.get("search") || "";
+
+  const { recipes, loading, error } = useGetAllRecipes(suitableFor.length > 0 ? suitableFor : undefined, 
+    search);
 
   if (error) {
     return (

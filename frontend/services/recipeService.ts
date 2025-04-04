@@ -20,31 +20,40 @@ class RecipeService {
     this.apiUrl = apiUrl;
   }
 
-  async fetchRecipes(suitableFor?: string[]): Promise<Recipe[]> {
+  async fetchRecipes(suitableFor?: string[], search?: string): Promise<Recipe[]> {
     try {
       const response = await apiRecipe.get(this.apiUrl, {
-        params: suitableFor?.length ? { suitableFor } : {},
+        params: {
+          ...(suitableFor?.length ? { suitableFor } : {}),
+          ...(search ? { search } : {})
+        },
         paramsSerializer: (params) => {
           const searchParams = new URLSearchParams();
-
+  
           const suitableFor = params.suitableFor as string[] | undefined;
-
+          const search = params.search as string | undefined;
+  
           if (suitableFor && suitableFor.length > 0) {
             suitableFor.forEach((val) => {
               searchParams.append("suitableFor", val);
             });
           }
-
+  
+          if (search) {
+            searchParams.set("search", search);
+          }
+  
           return searchParams.toString();
         },
       });
-
+  
       return response.data;
     } catch (error) {
       console.error("Error al obtener las recetas", error);
       throw error;
     }
   }
+  
 
 
   async fetchRecipesByCreator(creatorId: number): Promise<Recipe[]> {

@@ -157,12 +157,10 @@ export const deleteRecipe = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-// Obtener todas las recetas
-import { ParsedQs } from "qs";
-
 export const getAllRecipes = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const suitableForQuery = req.query.suitableFor;
+    const search = typeof req.query.search === "string" ? req.query.search : undefined;
 
     const suitableFor: string[] | undefined = Array.isArray(suitableForQuery)
       ? suitableForQuery.map(String)
@@ -170,7 +168,7 @@ export const getAllRecipes = async (req: Request, res: Response, next: NextFunct
         ? [String(suitableForQuery)]
         : undefined;
 
-    const recipes = await recipeService.getAllRecipes(suitableFor);
+    const recipes = await recipeService.getAllRecipes(suitableFor, search);
     res.status(200).json(recipes);
   } catch (error) {
     console.error("Error al obtener las recetas", error);

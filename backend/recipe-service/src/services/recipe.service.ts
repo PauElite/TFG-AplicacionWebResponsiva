@@ -10,7 +10,7 @@ export class RecipeService {
   }
 
   // Crear una receta
-  async createRecipe(title: string, description: string, ingredients: string[], 
+  async createRecipe(title: string, description: string, ingredients: string[],
     instructions: any[], prepTime: number, suitableFor: string[], difficulty: string, imageUrl: string, creatorId: number): Promise<Recipe> {
     const newRecipe = this.recipeRepository.create({
       title,
@@ -26,7 +26,7 @@ export class RecipeService {
     const recipe = await this.recipeRepository.save(newRecipe);
 
     await AppDataSource.query(
-      `UPDATE "user" SET "recipeIds" = array_append("recipeIds", $1) WHERE id = $2`, 
+      `UPDATE "user" SET "recipeIds" = array_append("recipeIds", $1) WHERE id = $2`,
       [recipe.id, creatorId]
     );
     return recipe;
@@ -35,25 +35,55 @@ export class RecipeService {
 
   // Obtener todas las recetas
   // Si se proporciona un parámetro suitableFor, filtra las recetas por ese valor
-  async getAllRecipes(suitableFor?: string[]): Promise<Recipe[]> {
+  // Si se proporciona un parámetro search, busca recetas por título o ingredientes
+  // Si no se proporciona ninguno, devuelve todas las recetas
+  async getAllRecipes(suitableFor?: string[], search?: string): Promise<Recipe[]> {
     const query = this.recipeRepository.createQueryBuilder("recipe");
+    const whereParts: string[] = [];
+    const params: Record<string, any> = {};
   
+    // suitableFor → OR conditions agrupadas
     if (suitableFor && suitableFor.length > 0) {
-      // Genera condiciones del tipo: 'airfrier' = ANY(recipe.suitableFor)
       suitableFor.forEach((value, index) => {
-        const param = `value${index}`;
-        const condition = `:${param} = ANY(recipe.suitableFor)`;
-        if (index === 0) {
-          query.where(condition, { [param]: value });
-        } else {
-          query.orWhere(condition, { [param]: value });
-        }
+        const paramName = `suitable${index}`;
+        whereParts.push(`:${paramName} = ANY(recipe.suitableFor)`);
+        params[paramName] = value;
       });
+    }
+  
+    // search → AND condition
+    if (search) {
+      const searchParam = `%${search.toLowerCase()}%`;
+      const searchCondition = `(LOWER(recipe.title) ILIKE :search OR EXISTS (
+        SELECT 1 FROM unnest(recipe.ingredients) AS ingredient
+        WHERE LOWER(ingredient) ILIKE :search
+      ))`;
+      whereParts.push(searchCondition);
+      params["search"] = searchParam;
+    }
+  
+    // Unir condiciones: suitableFor con OR entre paréntesis, y AND con search
+    if (whereParts.length > 0) {
+      const suitableForPart = suitableFor?.length
+        ? `(${whereParts.slice(0, suitableFor.length).join(" OR ")})`
+        : null;
+      const searchPart = search ? whereParts[whereParts.length - 1] : null;
+  
+      const finalWhere =
+        suitableForPart && searchPart
+          ? `${suitableForPart} AND ${searchPart}`
+          : suitableForPart || searchPart;
+  
+      if (finalWhere) {
+        query.where(finalWhere, params);
+      }
     }
   
     return await query.getMany();
   }
   
+  
+
 
   // Obtener una receta por ID
   async getRecipeById(id: number): Promise<Recipe | null> {
