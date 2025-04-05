@@ -70,53 +70,77 @@ export const RecipeFilter = () => {
         value={search}
         onChange={handleSearchChange}
         placeholder="Buscar por título o ingredientes..."
-        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white focus:ring-green-300"
       />
 
-      {/* Botones de filtro */}
-      <div className="flex items-center gap-4">
-        {OPTIONS.map(({ label, value, icon }) => (
-          <div key={value} className="relative group">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Botones de filtro */}
+        <div className="flex items-center gap-4">
+          {OPTIONS.map(({ label, value, icon }) => (
+            <div key={value} className="relative group">
+              <button
+                onClick={() => toggleOption(value)}
+                className={`px-4 py-2 rounded-lg transition-all shadow-sm border ${selected.includes(value)
+                    ? "bg-[#8b5e3c] text-white"
+                    : "bg-white text-gray-800 hover:bg-gray-100"
+                  }`}
+              >
+                <img
+                  src={icon}
+                  alt={label}
+                  className="w-7 h-7 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"
+                />
+              </button>
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap shadow-lg">
+                Filtrar por {label}
+              </span>
+            </div>
+          ))}
+
+          {/* Botón limpiar filtros */}
+          <div className="relative group">
             <button
-              onClick={() => toggleOption(value)}
-              className={`px-4 py-2 rounded-lg transition-all shadow-sm border ${
-                selected.includes(value)
+              onClick={clearFilters}
+              className={`px-4 py-2 rounded-lg transition-all shadow-sm border ${selected.length === 0 && !search
                   ? "bg-[#8b5e3c] text-white"
                   : "bg-white text-gray-800 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <img
-                src={icon}
-                alt={label}
+                src="https://img.icons8.com/pulsar-gradient/48/x-coordinate.png"
+                alt="Limpiar filtros"
                 className="w-7 h-7 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"
               />
             </button>
             <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap shadow-lg">
-              Filtrar por {label}
+              {selected.length === 0 && !search ? "Sin filtros activos" : "Limpiar filtros"}
             </span>
           </div>
-        ))}
+        </div>
 
-        <div className="relative group">
-          <button
-            onClick={clearFilters}
-            className={`px-4 py-2 rounded-lg transition-all shadow-sm border ${
-              selected.length === 0 && !search
-                ? "bg-[#8b5e3c] text-white"
-                : "bg-white text-gray-800 hover:bg-gray-100"
-            }`}
+        {/* Ordenar por (alineado a la derecha) */}
+        <div className="ml-auto">
+          <select
+            onChange={(e) => {
+              const params = new URLSearchParams(window.location.search);
+              if (e.target.value) {
+                params.set("sort", e.target.value);
+              } else {
+                params.delete("sort");
+              }
+              router.push(`/?${params.toString()}`);
+            }}
+            defaultValue={searchParams.get("sort") || ""}
+            className="px-4 py-2 border rounded-lg bg-white text-gray-800"
           >
-            <img
-              src="https://img.icons8.com/pulsar-gradient/48/x-coordinate.png"
-              alt="Limpiar filtros"
-              className="w-7 h-7 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"
-            />
-          </button>
-          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap shadow-lg">
-            {selected.length === 0 && !search ? "Sin filtros activos" : "Limpiar filtros"}
-          </span>
+            <option value="">Ordenar por...</option>
+            <option value="popularity">Popularidad</option>
+            <option value="difficulty">Dificultad</option>
+            <option value="prepTime">Tiempo de preparación</option>
+          </select>
         </div>
       </div>
+
 
       {/* Etiquetas activas */}
       <AnimatePresence>
@@ -173,6 +197,7 @@ export const RecipeFilter = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 };

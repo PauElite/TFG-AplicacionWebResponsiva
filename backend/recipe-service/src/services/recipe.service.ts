@@ -40,11 +40,12 @@ export class RecipeService {
   // Si se proporciona un parámetro suitableFor, filtra las recetas por ese valor
   // Si se proporciona un parámetro search, busca recetas por título o ingredientes
   // Si no se proporciona ninguno, devuelve todas las recetas
-  async getAllRecipes(suitableFor?: string[], search?: string): Promise<Recipe[]> {
+  async getAllRecipes(suitableFor?: string[], search?: string, sort?: "popularity" | "difficulty" | "prepTime"
+  ): Promise<Recipe[]> {
     const query = this.recipeRepository.createQueryBuilder("recipe");
     const whereParts: string[] = [];
     const params: Record<string, any> = {};
-  
+
     // suitableFor → OR conditions agrupadas
     if (suitableFor && suitableFor.length > 0) {
       suitableFor.forEach((value, index) => {
@@ -53,7 +54,7 @@ export class RecipeService {
         params[paramName] = value;
       });
     }
-  
+
     // search → AND condition
     if (search) {
       const searchParam = `%${search.toLowerCase()}%`;
@@ -64,28 +65,33 @@ export class RecipeService {
       whereParts.push(searchCondition);
       params["search"] = searchParam;
     }
-  
+
     // Unir condiciones: suitableFor con OR entre paréntesis, y AND con search
     if (whereParts.length > 0) {
       const suitableForPart = suitableFor?.length
         ? `(${whereParts.slice(0, suitableFor.length).join(" OR ")})`
         : null;
       const searchPart = search ? whereParts[whereParts.length - 1] : null;
-  
+
       const finalWhere =
         suitableForPart && searchPart
           ? `${suitableForPart} AND ${searchPart}`
           : suitableForPart || searchPart;
-  
+
       if (finalWhere) {
         query.where(finalWhere, params);
       }
     }
-  
+
+    // Ordenamiento
+    if (sort) {
+      query.orderBy(`recipe.${sort}`, "DESC");
+    }
+
     return await query.getMany();
   }
-  
-  
+
+
 
 
   // Obtener una receta por ID
@@ -121,9 +127,9 @@ export class RecipeService {
 
   // Votar por una receta
   async voteRecipe(userId: number, recipeId: number, value: 1 | -1): Promise<boolean> {
-  
+
     const existing = await this.voteRecipeReposistoy.findOneBy({ userId, recipeId });
-  
+
     if (!existing) {
       // No había voto → crear nuevo
       const newVote = this.voteRecipeReposistoy.create({ userId, recipeId, value });
@@ -136,19 +142,19 @@ export class RecipeService {
       existing.value = value;
       await this.voteRecipeReposistoy.save(existing);
     }
-  
+
     // Recalcular popularidad
     const { sum } = await this.voteRecipeReposistoy
       .createQueryBuilder("vote")
       .select("SUM(vote.value)", "sum")
       .where("vote.recipeId = :recipeId", { recipeId })
       .getRawOne();
-  
+
     await this.recipeRepository.update(recipeId, { popularity: Number(sum) || 0 });
-  
+
     return true;
   }
-  
+
 
   // Obtener recetas por ID de creador
   async getRecipesByCreator(creatorId: number): Promise<Recipe[]> {

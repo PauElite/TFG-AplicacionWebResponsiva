@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Recipe } from "../../../shared/models/recipe";
+import { Flame, Snowflake } from "lucide-react";
 
 interface RecipeListProps {
     recipes: Recipe[];
@@ -17,18 +18,11 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
         setTimeout(() => {
             setVisibleCount((prevCount) => prevCount + 6);
             setLoading(false);
-        }, 500); // Simulate loading time
-    }
+        }, 500);
+    };
 
     const getImageSrc = (url: string | undefined) => {
-        // Si empieza por http o https, es una URL externa → usarla tal cual
-        if (url) {
-            if (url.startsWith("http://") || url.startsWith("https://")) {
-                return url;
-            }
-        }
-
-        // Si no, asumimos que es una ruta del backend (por ejemplo: /uploads/...)
+        if (url?.startsWith("http://") || url?.startsWith("https://")) return url;
         return `http://localhost:3002${url}`;
     };
 
@@ -50,32 +44,34 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
                     <h2 className="text-xl font-bold mt-2">{recipe.title}</h2>
 
                     <p className="text-gray-600 text-sm mb-2">{recipe.description}</p>
-                    <div className="flex justify-between mt-auto">
+
+                    {/* Footer: Ver receta - Popularidad - Tiempo */}
+                    <div className="flex justify-between items-center mt-auto">
+                        {/* Ver receta */}
                         <Link
                             href={`/recipes/${recipe.id}`}
-                            className="text-[#8b5e3c] mt-auto hover:underline"
+                            className="text-[#8b5e3c] hover:underline"
                         >
                             Ver receta
                         </Link>
-                        {/* Popularidad visual */}
+
+                        {/* Popularidad centrada */}
                         {recipe.popularity !== 0 && (
                             <div
-                                className={`text-sm font-medium mb-1 flex items-center gap-1 ${recipe.popularity > 0
-                                        ? "text-green-600"
-                                        : "text-red-500"
-                                    } animate-pulse`}
+                                className={`text-sm font-medium flex items-center gap-1 ${
+                                    recipe.popularity > 0 ? "text-green-600" : "text-red-500"
+                                } animate-pulse`}
                                 title="Popularidad de la receta"
                             >
-                                <span>{recipe.popularity > 0 ? "🔥" : "❄️"}</span>
-                                <span>{recipe.popularity > 0 ? `+${recipe.popularity}` : recipe.popularity}</span>
+                                {recipe.popularity > 0 ? <Flame size={18} /> : <Snowflake size={18} />}
+                                {recipe.popularity > 0 ? `+${recipe.popularity}` : recipe.popularity}
                             </div>
                         )}
 
-
-
-                        <div className="flex items-center">
-                            <span className="text-gray-800 font-semibold">⏱️</span>
-                            <span className="text-gray-800 ml-1">{recipe.prepTime} min</span>
+                        {/* Tiempo */}
+                        <div className="flex items-center text-gray-800">
+                            <span className="font-semibold">⏱️</span>
+                            <span className="ml-1">{recipe.prepTime} min</span>
                         </div>
                     </div>
                 </div>

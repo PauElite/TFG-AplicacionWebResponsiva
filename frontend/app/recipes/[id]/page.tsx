@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { userService } from "@/services/userService";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { recipeService } from "@/services/recipeService";
 import { Toast } from "@/components/ui/Toast";
-import { ChevronUp, ChevronDown, Flame, Snowflake } from "lucide-react";
+import { ChevronUp, ChevronDown, Flame, Snowflake, Trash2 } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 
 export default function RecipeDetail() {
@@ -20,6 +21,8 @@ export default function RecipeDetail() {
   const { id } = useParams(); // Obtener el ID de la URL dinámica
   const { user } = useAuth();
   const [toast, setToast] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -124,6 +127,16 @@ export default function RecipeDetail() {
       setRecipe(updated.data);
     } catch (error) {
       console.error("❌ Error al votar", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await recipeService.deleteRecipe(recipe.id);
+      router.push("/"); // Redirige al home tras eliminar
+    } catch (error) {
+      console.error("❌ Error al eliminar receta:", error);
+      setToast("No se pudo eliminar la receta.");
     }
   };
 
@@ -271,6 +284,14 @@ export default function RecipeDetail() {
           ))}
 
         </div>
+        {user?.id === creatorId && (
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="text-sm text-red-600 flex items-center gap-2 hover:text-red-700 mt-2"
+          >
+            <Trash2 size={18} /> Eliminar receta
+          </button>
+        )}
         <h1 className="text-xs text-gray-800 text-right mb-4">
           Receta subida por:{" "}
           <Link
@@ -282,6 +303,15 @@ export default function RecipeDetail() {
         </h1>
       </div>
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+      {showConfirm && (
+        <ConfirmModal
+        isOpen={showConfirm}
+        message="¿Estás seguro de que deseas eliminar esta receta?"
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleDelete}
+      />
+      
+      )}
     </div>
   );
 }

@@ -10,9 +10,10 @@ export default function Home() {
   const searchParams = useSearchParams();
   const suitableFor = searchParams.getAll("suitableFor");
   const search = searchParams.get("search") || "";
+  const sort = searchParams.get("sort") || "";
 
   const { recipes, loading, error } = useGetAllRecipes(suitableFor.length > 0 ? suitableFor : undefined, 
-    search);
+    search, sort);
 
   if (error) {
     return (
