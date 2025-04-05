@@ -115,6 +115,14 @@ class RecipeService {
     }
   }
 
+  async voteRecipe(recipeId: number, userId: number, value: 1 | -1): Promise<void> {
+    try {
+      await apiRecipe.post(`${this.apiUrl}/${recipeId}/vote`, { userId, value });
+    } catch (error) {
+      console.error("Error al votar la receta", error);
+      throw error;
+    }
+  }
 
 
 }

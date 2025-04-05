@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { Recipe } from "../models/recipe.model";
+import { RecipeVote } from "../models/recipeVote.model";
 import dotenv from "dotenv"
 
 dotenv.config();
@@ -12,7 +13,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     logging: ["error", "warn"], // Para que la consola solo muestre errores y advertencias
-    entities: [Recipe],
+    entities: [Recipe, RecipeVote],
 });
 AppDataSource.initialize()
     .then(() => console.log("✅ Conexión del microservicio Recetas a la base de datos establecida"))

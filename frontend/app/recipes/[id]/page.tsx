@@ -5,6 +5,11 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { userService } from "@/services/userService";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { recipeService } from "@/services/recipeService";
+import { Toast } from "@/components/ui/Toast";
+import { ChevronUp, ChevronDown, Flame, Snowflake } from "lucide-react";
+
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
@@ -13,6 +18,8 @@ export default function RecipeDetail() {
   const [username, setUsername] = useState<any>(null);
   const [creatorId, setCreatorId] = useState<any>(null);
   const { id } = useParams(); // Obtener el ID de la URL dinámica
+  const { user } = useAuth();
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -105,6 +112,21 @@ export default function RecipeDetail() {
     return carrots;
   };
 
+  const handleVote = async (value: 1 | -1) => {
+    if (!user) {
+      setToast("Debes iniciar sesión para votar");
+      return;
+    }
+    try {
+      await recipeService.voteRecipe(recipe.id, user.id, value);
+      // Recargar receta tras votar
+      const updated = await axios.get(`http://localhost:3002/recetas/${id}`);
+      setRecipe(updated.data);
+    } catch (error) {
+      console.error("❌ Error al votar", error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 py-8">
       <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg space-y-6">
@@ -113,7 +135,42 @@ export default function RecipeDetail() {
           alt={recipe.title}
           className="w-full h-48 object-cover rounded mb-4"
         />
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4">{recipe.title}</h1>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex-1 text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold">{recipe.title}</h1>
+          </div>
+
+          <div className="flex flex-col justify-center items-center ml-4">
+            <button
+              onClick={() => handleVote(1)}
+              className="text-green-600 hover:text-green-700 transition-transform hover:scale-110"
+              title="Me gusta esta receta"
+            >
+              <ChevronUp size={24} />
+            </button>
+
+            {recipe.popularity !== 0 && (
+              <div
+                className={`text-lg font-semibold flex items-center gap-1 ${recipe.popularity > 0 ? "text-green-600" : "text-red-500"
+                  } animate-pulse`}
+                title="Popularidad de la receta"
+              >
+                {recipe.popularity > 0 ? <Flame size={20} /> : <Snowflake size={20} />}
+                {recipe.popularity > 0 ? `+${recipe.popularity}` : recipe.popularity}
+              </div>
+            )}
+
+            <button
+              onClick={() => handleVote(-1)}
+              className="text-red-500 hover:text-red-600 transition-transform hover:scale-110"
+              title="No me gusta esta receta"
+            >
+              <ChevronDown size={24} />
+            </button>
+          </div>
+        </div>
+
+
         <p className="text-gray-600 text-center mb-6 px-2 max-w-2xl">{recipe.description}</p>
         {recipe.suitableFor?.length > 0 && (
           <div className="flex justify-center gap-4 items-center mb-6">
@@ -129,6 +186,7 @@ export default function RecipeDetail() {
                 />
                 <span className="text-sm font-medium text-gray-700">AirFrier</span>
               </Link>
+
             )}
 
             {recipe.suitableFor.includes("horno") && (
@@ -223,6 +281,7 @@ export default function RecipeDetail() {
           </Link>
         </h1>
       </div>
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }

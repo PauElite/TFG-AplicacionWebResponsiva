@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Check, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Check, OneToMany } from "typeorm";
 
 export enum MediaType {
   IMAGE = "image",
@@ -36,17 +36,20 @@ export class Recipe {
   @Column("text", { array: true, nullable: true })
   suitableFor?: string[]; // ["airfrier", "horno"]
 
-  @Column({ 
-    type: "varchar", 
-    nullable: true, 
+  @Column({
+    type: "varchar",
+    nullable: true,
     length: 1,  // Limitar la longitud a 1 carácter
   })
   @Check(`"difficulty" BETWEEN '1' AND '5'`)  // Restricción de valor entre 1 y 5
   difficulty!: string;
 
-  @Column({ type: "varchar"})
+  @Column({ type: "varchar" })
   imageUrl!: string;
 
   @Column({ nullable: true })
   creatorId!: number;
+
+  @Column({ type: "int", default: 0 })
+  popularity!: number;
 }

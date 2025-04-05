@@ -47,12 +47,12 @@ export class User {
     @UpdateDateColumn()
     updatedAt!: Date;
 
-    @Column("int", { array: true, default: []})
+    @Column("int", { array: true, default: [] })
     recipeIds!: number[];
 
-    @Column({default: "avatar1"})
+    @Column({ default: "avatar1" })
     avatar!: string;
 
-    @Column({type: "text", default: "Amante de la cocina y la buena comida."})
+    @Column({ type: "text", default: "Amante de la cocina y la buena comida." })
     bio!: string;
 }

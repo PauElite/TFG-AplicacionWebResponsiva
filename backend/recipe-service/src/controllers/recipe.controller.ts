@@ -109,7 +109,7 @@ export const getRecipeById = async (req: Request, res: Response, next: NextFunct
     }
     res.status(200).json(recipe);
   } catch (error) {
-    console.error("Error al obtener la receta por ID", error);
+    console.error("❌ Error al obtener la receta por ID", error);
     next(error);
   }
 }
@@ -134,11 +134,12 @@ export const updateRecipe = async (req: Request, res: Response, next: NextFuncti
     }
     res.status(200).json({ message: "Receta actualizada con éxito", updatedRecipe });
   } catch (error) {
-    console.error("Error al actualizar la receta", error);
+    console.error("❌ Error al actualizar la receta", error);
     next(error);
   }
 }
 
+// Eliminar una receta
 export const deleteRecipe = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   if (!id) {
@@ -152,10 +153,28 @@ export const deleteRecipe = async (req: Request, res: Response, next: NextFuncti
     }
     res.status(200).json({ message: "Receta eliminada con éxito" });
   } catch (error) {
-    console.error("Error al eliminar la receta", error);
+    console.error("❌ Error al eliminar la receta", error);
     next(error);
   }
-}
+};
+
+// Votar por una receta
+export const voteOnRecipe = async (req: Request, res: Response, next: NextFunction) => {
+  const recipeId = parseInt(req.params.id);
+  const { value, userId } = req.body;
+
+  if (!recipeId || !userId || ![1, -1].includes(value)) {
+    return next({ status: 400, message: "Datos inválidos: faltan campos o el valor no es válido." });
+  }
+
+  try {
+    await recipeService.voteRecipe(userId, recipeId, value);
+    res.status(200).json({ message: "Voto procesado con éxito." });
+  } catch (error) {
+    console.error("❌ Error al votar receta:", error);
+    next(error);
+  }
+};
 
 export const getAllRecipes = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -171,12 +190,10 @@ export const getAllRecipes = async (req: Request, res: Response, next: NextFunct
     const recipes = await recipeService.getAllRecipes(suitableFor, search);
     res.status(200).json(recipes);
   } catch (error) {
-    console.error("Error al obtener las recetas", error);
+    console.error("❌ Error al obtener las recetas", error);
     next(error);
   }
 };
-
-
 
 
 // Obtener recetas por ID de creador
@@ -190,7 +207,7 @@ export const getRecipesByCreator = async (req: Request, res: Response, next: Nex
     const recipes = await recipeService.getRecipesByCreator(Number(creatorId));
     res.status(200).json(recipes);
   } catch (error) {
-    console.error("Error al obtener las recetas del creador", error);
+    console.error("❌ Error al obtener las recetas del creador", error);
     next(error);
   }
 }

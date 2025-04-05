@@ -17,6 +17,7 @@ export interface Step {
     difficulty: string;
     imageUrl?: string;
     creatorId: number;
+    popularity: number;
     imageFile?: File;
   }
   

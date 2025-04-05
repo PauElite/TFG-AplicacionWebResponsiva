@@ -1,14 +1,6 @@
 import Link from "next/link";
 import { useState } from "react";
-
-
-interface Recipe {
-    id: number;
-    title: string;
-    description: string;
-    imageUrl: string;
-    prepTime: number;
-}
+import { Recipe } from "../../../shared/models/recipe";
 
 interface RecipeListProps {
     recipes: Recipe[];
@@ -28,12 +20,14 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
         }, 500); // Simulate loading time
     }
 
-    const getImageSrc = (url: string) => {
+    const getImageSrc = (url: string | undefined) => {
         // Si empieza por http o https, es una URL externa → usarla tal cual
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-          return url;
+        if (url) {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                return url;
+            }
         }
-      
+
         // Si no, asumimos que es una ruta del backend (por ejemplo: /uploads/...)
         return `http://localhost:3002${url}`;
     };
@@ -54,6 +48,7 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
                         />
                     </Link>
                     <h2 className="text-xl font-bold mt-2">{recipe.title}</h2>
+
                     <p className="text-gray-600 text-sm mb-2">{recipe.description}</p>
                     <div className="flex justify-between mt-auto">
                         <Link
@@ -62,6 +57,22 @@ export const RecipeList = ({ recipes }: RecipeListProps) => {
                         >
                             Ver receta
                         </Link>
+                        {/* Popularidad visual */}
+                        {recipe.popularity !== 0 && (
+                            <div
+                                className={`text-sm font-medium mb-1 flex items-center gap-1 ${recipe.popularity > 0
+                                        ? "text-green-600"
+                                        : "text-red-500"
+                                    } animate-pulse`}
+                                title="Popularidad de la receta"
+                            >
+                                <span>{recipe.popularity > 0 ? "🔥" : "❄️"}</span>
+                                <span>{recipe.popularity > 0 ? `+${recipe.popularity}` : recipe.popularity}</span>
+                            </div>
+                        )}
+
+
+
                         <div className="flex items-center">
                             <span className="text-gray-800 font-semibold">⏱️</span>
                             <span className="text-gray-800 ml-1">{recipe.prepTime} min</span>

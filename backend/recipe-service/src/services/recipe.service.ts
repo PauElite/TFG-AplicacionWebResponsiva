@@ -1,12 +1,15 @@
 import { AppDataSource } from "../config/ormconfig";
 import { Repository } from "typeorm";
 import { Recipe } from "../models/recipe.model";
+import { RecipeVote } from "../models/recipeVote.model";
 
 export class RecipeService {
   private recipeRepository: Repository<Recipe>;
+  private voteRecipeReposistoy: Repository<RecipeVote>;
 
   constructor() {
     this.recipeRepository = AppDataSource.getRepository(Recipe);
+    this.voteRecipeReposistoy = AppDataSource.getRepository(RecipeVote);
   }
 
   // Crear una receta
@@ -115,6 +118,37 @@ export class RecipeService {
     await this.recipeRepository.remove(recipe);
     return true;  // Receta eliminada con éxito
   }
+
+  // Votar por una receta
+  async voteRecipe(userId: number, recipeId: number, value: 1 | -1): Promise<boolean> {
+  
+    const existing = await this.voteRecipeReposistoy.findOneBy({ userId, recipeId });
+  
+    if (!existing) {
+      // No había voto → crear nuevo
+      const newVote = this.voteRecipeReposistoy.create({ userId, recipeId, value });
+      await this.voteRecipeReposistoy.save(newVote);
+    } else if (existing.value === value) {
+      // Mismo voto → eliminarlo (quitar el voto)
+      await this.voteRecipeReposistoy.delete({ id: existing.id });
+    } else {
+      // Voto diferente → actualizar
+      existing.value = value;
+      await this.voteRecipeReposistoy.save(existing);
+    }
+  
+    // Recalcular popularidad
+    const { sum } = await this.voteRecipeReposistoy
+      .createQueryBuilder("vote")
+      .select("SUM(vote.value)", "sum")
+      .where("vote.recipeId = :recipeId", { recipeId })
+      .getRawOne();
+  
+    await this.recipeRepository.update(recipeId, { popularity: Number(sum) || 0 });
+  
+    return true;
+  }
+  
 
   // Obtener recetas por ID de creador
   async getRecipesByCreator(creatorId: number): Promise<Recipe[]> {
