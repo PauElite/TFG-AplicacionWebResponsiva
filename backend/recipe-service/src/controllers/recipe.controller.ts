@@ -11,14 +11,22 @@ const recipeSchema = Joi.object({
     Joi.object({
       title: Joi.string().required(),
       description: Joi.string().required(),
-      mediaUrl: Joi.string().uri().optional(),
+      mediaUrl: Joi.alternatives().try(
+        Joi.string().uri(),
+        Joi.string().pattern(/^\/uploads\/.+/),
+        Joi.string().valid("")
+      ).optional(),
       mediaType: Joi.string().valid(...Object.values(MediaType)).optional()
     })
   ).required(),
   prepTime: Joi.number().min(1).required(),
-  suitableFor: Joi.array().items(Joi.string().valid("airfrier", "horno")).optional(),
+  suitableFor: Joi.array().items(Joi.string().valid("airfrier", "horno")).optional().default([]),
   difficulty: Joi.number().valid(1, 2, 3, 4, 5).required(),
-  imageUrl: Joi.string().uri().optional(),
+  imageUrl: Joi.alternatives().try(
+    Joi.string().uri(),
+    Joi.string().pattern(/^\/uploads\/.+/),
+    Joi.string().valid("")
+  ),
   creatorId: Joi.number().required()
 });
 
@@ -44,7 +52,7 @@ export const createRecipe = async (req: Request, res: Response, next: NextFuncti
 
     // Obtener imagen principal
     let imageUrl = data.imageUrl;
-    const imageFile = Array.isArray(req.files) 
+    const imageFile = Array.isArray(req.files)
       ? req.files.find((file: any) => file.fieldname === "imageFile")
       : req.files?.["imageFile"]?.[0];
 
@@ -116,28 +124,55 @@ export const getRecipeById = async (req: Request, res: Response, next: NextFunct
 
 // Actualizar una receta
 export const updateRecipe = async (req: Request, res: Response, next: NextFunction) => {
-  const { error } = updateRecipeSchema.validate(req.body);
-
-  if (error) {
-    return next({ status: 400, message: error.details[0].message });
-  }
-
   const { id } = req.params;
+
   if (!id) {
     return next({ status: 400, message: "El ID de la receta es obligatorio" });
   }
 
   try {
-    const updatedRecipe = await recipeService.updateRecipe(Number(id), req.body);
-    if (!updatedRecipe) {
+    const rawData = req.body.data;
+    if (!rawData) {
+      return next({ status: 400, message: "Faltan los datos de la receta" });
+    }
+
+    const parsedData = JSON.parse(rawData);
+
+    if (parsedData.suitableFor && !Array.isArray(parsedData.suitableFor)) {
+      parsedData.suitableFor = [parsedData.suitableFor];
+    }
+
+    // Validar (sin permitir campos vacíos incorrectos)
+    const { error } = updateRecipeSchema.validate(parsedData);
+    if (error) {
+      return next({ status: 400, message: error.details[0].message });
+    }
+
+    // Obtener la receta actual
+    const existingRecipe = await recipeService.getRecipeById(Number(id));
+    if (!existingRecipe) {
       return next({ status: 404, message: "Receta no encontrada" });
     }
+
+    // ✅ Evitar sobrescribir la imagen principal
+    parsedData.imageUrl = existingRecipe.imageUrl;
+
+    // ✅ Evitar modificar imágenes por paso
+    parsedData.instructions = parsedData.instructions.map((step: any, index: number) => ({
+      ...step,
+      mediaUrl: existingRecipe.instructions[index]?.mediaUrl || "",
+      mediaType: existingRecipe.instructions[index]?.mediaType || undefined,
+    }));
+
+    const updatedRecipe = await recipeService.updateRecipe(Number(id), parsedData);
+
     res.status(200).json({ message: "Receta actualizada con éxito", updatedRecipe });
   } catch (error) {
     console.error("❌ Error al actualizar la receta", error);
     next(error);
   }
-}
+};
+
 
 // Eliminar una receta
 export const deleteRecipe = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,17 +1,6 @@
 import { apiRecipe } from "@/utils/apiRecipe";
 import { RecetaFormData } from "../types/receta";
-
-interface Recipe {
-  id: string;
-  title: string;
-  description: string;
-  ingredients: string[];
-  instructions: string;
-  prepTime: number;
-  difficulty: number;
-  imageUrl: string;
-  creatorId: number;
-}
+import { Recipe } from "../../shared/models/recipe";
 
 class RecipeService {
   private apiUrl: string;
@@ -53,6 +42,56 @@ class RecipeService {
       throw error;
     }
   }
+
+  async getRecipeById(recipeId: number): Promise<Recipe | null> {
+    try {
+      const response = await apiRecipe.get(`${this.apiUrl}/${recipeId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener la receta", error);
+      throw error;
+    }
+  }
+
+  async updateRecipe(recipeId: number, data: RecetaFormData): Promise<void> {
+    try {
+      const formData = new FormData();
+
+      // Convertir los datos a JSON y añadirlos como campo 'data'
+      const dataToSend = {
+        ...data,
+        // Limpiar campos de archivo para el backend si hay URLs
+        instructions: data.instructions.map((step) => ({
+          title: step.title,
+          description: step.description,
+          mediaUrl: step.mediaUrl,
+          mediaType: step.mediaType,
+        }))
+      };
+
+      formData.append("data", JSON.stringify(dataToSend));
+
+      // Si hay imagen principal nueva
+      if (data.imageFile) {
+        formData.append("imageFile", data.imageFile);
+      }
+
+      // Añadir archivos locales por pasos
+      data.instructions.forEach((step, index) => {
+        if (step.file) {
+          formData.append("stepFiles", step.file);
+        }
+      });
+
+      await apiRecipe.put(`${this.apiUrl}/${recipeId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    } catch (error) {
+      console.error("Error al actualizar la receta", error);
+      throw error;
+    }
+  }
+
 
   async deleteRecipe(recipeId: number): Promise<void> {
     try {

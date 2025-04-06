@@ -1,25 +1,36 @@
 import { useState } from "react";
 import type { RecetaFormData } from "@/types/receta"
 import type { Step } from "../../../shared/models/recipe";
+import { useEffect } from "react";
+import { getEmbedMedia, getImageSrc } from "@/utils/mediaUtils";
 import { BurgerLoadingAnimation } from "@/components/views/loading/BurgerLoadingAnimation";
 
 interface RecipeFormProps {
     onSubmit: (formData: RecetaFormData) => Promise<void>;
     loading: boolean;
     error: string | null;
+    initialData?: RecetaFormData;
 }
 
-export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
-    const [formData, setFormData] = useState<RecetaFormData>({
-        title: "",
-        description: "",
-        ingredients: [""],
-        instructions: [{ title: "", description: "" }],
-        prepTime: 0,
-        suitableFor: [],
-        difficulty: "1",
-        imageUrl: ""
-    });
+export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeFormProps) => {
+    const [formData, setFormData] = useState<RecetaFormData>(
+        initialData || {
+            title: "",
+            description: "",
+            ingredients: [""],
+            instructions: [{ title: "", description: "" }],
+            prepTime: 0,
+            suitableFor: [],
+            difficulty: "1",
+            imageUrl: ""
+        }
+    );
+
+    useEffect(() => {
+        if (initialData) {
+            setFormData(initialData);
+        }
+    }, [initialData]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -142,9 +153,9 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                                 }));
                                             }}
                                         />
-                                        <img width="32" height="32" src="https://img.icons8.com/external-filled-line-andi-nur-abdillah/64/external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah.png" 
-                                        alt="external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah" 
-                                        className="w-8 h-8 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"/>
+                                        <img width="32" height="32" src="https://img.icons8.com/external-filled-line-andi-nur-abdillah/64/external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah.png"
+                                            alt="external-Air-Fryer-home-appliances-(filled-line)-filled-line-andi-nur-abdillah"
+                                            className="w-8 h-8 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125" />
                                         <span>AirFrier</span>
                                     </label>
 
@@ -162,9 +173,9 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                                 }));
                                             }}
                                         />
-                                        <img width="32" height="32" src="https://img.icons8.com/external-kiranshastry-lineal-color-kiranshastry/64/external-oven-kitchen-kiranshastry-lineal-color-kiranshastry.png" 
-                                        alt="external-oven-kitchen-kiranshastry-lineal-color-kiranshastry"
-                                        className="w-8 h-8 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125"/>
+                                        <img width="32" height="32" src="https://img.icons8.com/external-kiranshastry-lineal-color-kiranshastry/64/external-oven-kitchen-kiranshastry-lineal-color-kiranshastry.png"
+                                            alt="external-oven-kitchen-kiranshastry-lineal-color-kiranshastry"
+                                            className="w-8 h-8 transition-transform duration-200 group-hover:scale-110 group-hover:brightness-125" />
                                         <span>Horno</span>
                                     </label>
                                 </div>
@@ -172,33 +183,48 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
 
                         </div>
 
-                        <div>
-                            <label className="block text-gray-700 mb-2">URL de la imagen</label>
-                            <input
-                                type="url"
-                                name="imageUrl"
-                                value={formData.imageUrl}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
-                                placeholder="https://ejemplo.com/imagen.jpg"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 mb-2">Imagen desde tu ordenador</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    if (e.target.files?.[0]) {
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            imageFile: e.target.files![0],
-                                            imageUrl: "" // vacía la URL si sube archivo
-                                        }));
-                                    }
-                                }}
-                            />
-                        </div>
+                        {initialData ? (
+                            <div>
+                                <label className="block text-gray-700 mb-2">Imagen principal</label>
+                                <img
+                                    src={getImageSrc(formData.imageUrl)}
+                                    alt="Imagen de la receta"
+                                    className="max-w-xs rounded-lg shadow-md"
+                                />
+                                <p className="text-sm text-gray-500 mt-1">No se puede modificar al editar.</p>
+                            </div>
+                        ) : (
+                            <>
+                                <div>
+                                    <label className="block text-gray-700 mb-2">URL de la imagen</label>
+                                    <input
+                                        type="url"
+                                        name="imageUrl"
+                                        value={getImageSrc(formData.imageUrl)}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
+                                        placeholder="https://ejemplo.com/imagen.jpg"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-700 mb-2">Imagen desde tu ordenador</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            if (e.target.files?.[0]) {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    imageFile: e.target.files![0],
+                                                    imageUrl: "" // vacía la URL si sube archivo
+                                                }));
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </>
+                        )}
+
                     </div>
                 </div>
 
@@ -265,42 +291,64 @@ export const RecipeForm = ({ onSubmit, loading, error }: RecipeFormProps) => {
                                     required
                                 />
                             </div>
-                            {/* Campo para URL de vídeo */}
-                            <div className="mb-2">
-                                <label className="block text-gray-700 mb-1">Vídeo (URL de YouTube, Vimeo, etc.)</label>
-                                <input
-                                    type="url"
-                                    value={step.mediaUrl || ""}
-                                    onChange={(e) => {
-                                        handleInstructionChange(index, "mediaUrl", e.target.value);
-                                        if (step.mediaType !== "video") {
-                                            handleInstructionChange(index, "mediaType", "video");
-                                        }
-                                    }}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="https://youtube.com/..."
-                                />
-                            </div>
+                            {initialData ? (
+                                step.mediaUrl && (
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-600">Media asociado:</p>
+                                        {step.mediaType === "image" ? (
+                                            <img
+                                                src={getImageSrc(step.mediaUrl)}
+                                                alt={`Paso ${index + 1}`}
+                                                className="w-full max-w-xs rounded-lg mt-1"
+                                            />
+                                        ) : (
+                                            <video
+                                                controls
+                                                src={step.mediaUrl}
+                                                className="w-full max-w-xs rounded-lg mt-1"
+                                            />
+                                        )}
+                                    </div>
+                                )
+                            ) : (
+                                <>
+                                    {/* Campo para URL de vídeo */}
+                                    <div className="mb-2">
+                                        <label className="block text-gray-700 mb-1">Vídeo (URL de YouTube, Vimeo, etc.)</label>
+                                        <input
+                                            type="url"
+                                            value={step.mediaUrl || ""}
+                                            onChange={(e) => {
+                                                handleInstructionChange(index, "mediaUrl", e.target.value);
+                                                if (step.mediaType !== "video") {
+                                                    handleInstructionChange(index, "mediaType", "video");
+                                                }
+                                            }}
+                                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="https://youtube.com/..."
+                                        />
+                                    </div>
 
-                            {/* Campo para subir imagen local */}
-                            <div className="mb-2">
-                                <label className="block text-gray-700 mb-1">Imagen (archivo local)</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        setFormData(prev => {
-                                            const newInstructions = [...prev.instructions];
-                                            newInstructions[index].file = file;
-                                            newInstructions[index].mediaType = "image";
-                                            newInstructions[index].mediaUrl = ""; // limpiamos si se sube imagen
-                                            return { ...prev, instructions: newInstructions };
-                                        });
-                                    }}
-                                />
-                            </div>
-
+                                    {/* Campo para subir imagen local */}
+                                    <div className="mb-2">
+                                        <label className="block text-gray-700 mb-1">Imagen (archivo local)</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                setFormData(prev => {
+                                                    const newInstructions = [...prev.instructions];
+                                                    newInstructions[index].file = file;
+                                                    newInstructions[index].mediaType = "image";
+                                                    newInstructions[index].mediaUrl = ""; // limpiamos si se sube imagen
+                                                    return { ...prev, instructions: newInstructions };
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            )}
 
                             {formData.instructions.length > 1 && (
                                 <button

@@ -7,7 +7,7 @@ const router = express.Router();
 // Definir rutas
 router.post("/", recipeUploads, createRecipe); // Endpoint para crear una receta
 router.get("/:id", getRecipeById); // Endpoint para obtener una receta por ID
-router.put("/:id", updateRecipe); // Endpoint para actualizar una receta por ID
+router.put("/:id", recipeUploads, updateRecipe); // Endpoint para actualizar una receta por ID
 router.delete("/:id", deleteRecipe); // Endpoint para eliminar una receta por ID
 router.post("/:id/vote", voteOnRecipe); // Endpoint para votar por una receta
 router.get("/", getAllRecipes); // Endpoint para obtener todas las recetas

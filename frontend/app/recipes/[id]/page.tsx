@@ -8,8 +8,9 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { recipeService } from "@/services/recipeService";
 import { Toast } from "@/components/ui/Toast";
-import { ChevronUp, ChevronDown, Flame, Snowflake, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Flame, Snowflake, Trash2, Pencil } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { getEmbedMedia, getImageSrc } from "@/utils/mediaUtils";
 
 
 export default function RecipeDetail() {
@@ -24,28 +25,27 @@ export default function RecipeDetail() {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
 
+
   useEffect(() => {
     const loadRecipe = async () => {
       try {
-        // 1. Espera a que se complete la petición de la receta
-        const recipe = await axios.get(`http://localhost:3002/recetas/${id}`);
-        setRecipe(recipe.data);
-
-        // 2. Solo si existe creatorId, busca al usuario
-        if (recipe.data.creatorId) {
-          const response = await getUserById(recipe.data.creatorId);
-          setUsername(response.name);
-          setCreatorId(recipe.data.creatorId);
+        const recipeData = await recipeService.getRecipeById(Number(id));
+        setRecipe(recipeData);
+  
+        if (recipeData) {
+          const user = await userService.getUserById(recipeData.creatorId);
+          setUsername(user.name);
+          setCreatorId(recipeData.creatorId);
         }
-
+  
       } catch (error) {
         console.error("Error cargando datos de la receta:", error);
       } finally {
         setLoading(false);
       }
-    }
-
-    loadRecipe();
+    };
+  
+    if (id) loadRecipe();
   }, [id]);
 
   if (loading) {
@@ -63,44 +63,6 @@ export default function RecipeDetail() {
       </div>
     );
   }
-
-  const getEmbedMedia = (url: string): { embedUrl: string; platform: "youtube" | "vimeo" | "other" } => {
-    // YouTube (watch?v=...)
-    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-    if (youtubeMatch) {
-      return {
-        embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
-        platform: "youtube"
-      };
-    }
-
-    // Vimeo (vimeo.com/123456)
-    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-    if (vimeoMatch) {
-      return {
-        embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
-        platform: "vimeo"
-      };
-    }
-
-    // Otras URLs (videos locales o de otro servidor)
-    return {
-      embedUrl: url,
-      platform: "other"
-    };
-  };
-
-  // Función para obtener la URL de la imagen
-  // (si es una URL externa o una ruta del backend)
-  const getImageSrc = (url: string) => {
-    // Si empieza por http o https, es una URL externa → usarla tal cual
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
-    }
-
-    // Si no, asumimos que es una ruta del backend (por ejemplo: /uploads/...)
-    return `http://localhost:3002${url}`;
-  };
 
   // Función para renderizar las zanahorias llenas y vacías según la dificultad
   const renderDifficulty = (difficulty: number) => {
@@ -247,7 +209,7 @@ export default function RecipeDetail() {
 
               {step.mediaUrl && step.mediaType === "image" && (
                 <img
-                  src={`http://localhost:3002${step.mediaUrl}`}
+                  src={getImageSrc(step.mediaUrl)}
                   alt={`Paso ${index + 1}`}
                   className="w-full max-w-md h-auto rounded-lg mb-4"
                 />
@@ -285,12 +247,20 @@ export default function RecipeDetail() {
 
         </div>
         {user?.id === creatorId && (
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="text-sm text-red-600 flex items-center gap-2 hover:text-red-700 mt-2"
-          >
-            <Trash2 size={18} /> Eliminar receta
-          </button>
+          <div className="flex gap-4 mt-2">
+            <button
+              onClick={() => router.push(`/recipes/edit/${recipe.id}`)}
+              className="text-sm text-[#8b5e3c] flex items-center gap-2 hover:underline"
+            >
+              <Pencil size={18} /> Editar receta
+            </button>
+            <button
+              onClick={() => setShowConfirm(true)}
+              className="text-sm text-red-600 flex items-center gap-2 hover:underline"
+            >
+              <Trash2 size={18} /> Eliminar receta
+            </button>
+          </div>
         )}
         <h1 className="text-xs text-gray-800 text-right mb-4">
           Receta subida por:{" "}
@@ -305,12 +275,12 @@ export default function RecipeDetail() {
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
       {showConfirm && (
         <ConfirmModal
-        isOpen={showConfirm}
-        message="¿Estás seguro de que deseas eliminar esta receta?"
-        onClose={() => setShowConfirm(false)}
-        onConfirm={handleDelete}
-      />
-      
+          isOpen={showConfirm}
+          message="¿Estás seguro de que deseas eliminar esta receta?"
+          onClose={() => setShowConfirm(false)}
+          onConfirm={handleDelete}
+        />
+
       )}
     </div>
   );

@@ -91,9 +91,6 @@ export class RecipeService {
     return await query.getMany();
   }
 
-
-
-
   // Obtener una receta por ID
   async getRecipeById(id: number): Promise<Recipe | null> {
     return await this.recipeRepository.findOne({ where: { id } });
@@ -118,12 +115,21 @@ export class RecipeService {
     const recipe = await this.recipeRepository.findOne({ where: { id } });
 
     if (!recipe) {
-      return false;  // Si no se encuentra la receta, no se puede eliminar
+      return false; // Si no se encuentra la receta, no se puede eliminar
     }
 
+    // Eliminar el ID de la receta del array `recipeIds` del usuario
+    await AppDataSource.query(
+      `UPDATE "user" SET "recipeIds" = array_remove("recipeIds", $1) WHERE id = $2`,
+      [id, recipe.creatorId]
+    );
+
+    // Eliminar la receta en sí
     await this.recipeRepository.remove(recipe);
-    return true;  // Receta eliminada con éxito
+
+    return true; // Receta eliminada con éxito
   }
+
 
   // Votar por una receta
   async voteRecipe(userId: number, recipeId: number, value: 1 | -1): Promise<boolean> {
