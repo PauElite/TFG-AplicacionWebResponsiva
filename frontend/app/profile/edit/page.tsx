@@ -59,7 +59,7 @@ export default function ProfileEditPage() {
     return (
         <ProtectedRoute>
         <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-6 text-green-600">Editar Perfil</h1>
+            <h1 className="text-2xl font-bold mb-6 text-[#8b5e3c]">Editar Perfil</h1>
 
             {error && <div className="text-red-500 mb-4">{error}</div>}
 

@@ -73,7 +73,7 @@ export const RecipeFilter = () => {
         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white focus:ring-green-300"
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
+<div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between sm:items-center">
         {/* Botones de filtro */}
         <div className="flex items-center gap-4">
           {OPTIONS.map(({ label, value, icon }) => (
@@ -119,8 +119,10 @@ export const RecipeFilter = () => {
         </div>
 
         {/* Ordenar por (alineado a la derecha) */}
-        <div className="ml-auto">
+        <div className="w-full sm:w-auto sm:ml-auto text-center">
+
           <select
+          className="w-full sm:w-auto px-4 py-2 border rounded-lg bg-white text-gray-800"
             onChange={(e) => {
               const params = new URLSearchParams(window.location.search);
               if (e.target.value) {
