@@ -254,35 +254,50 @@ export default function RecipeDetail() {
           </button>
         </div>
 
-        {/* Sección expandible de información nutricional */}
         {showNutrition && totalNutrition && (
-          <div className="mt-4 border p-4 rounded">
-            <h3 className="text-xl font-bold mb-2">Información Nutricional Total</h3>
-            <table className="w-full text-left">
-              <thead>
-                <tr>
-                  <th className="py-1">Calorías</th>
-                  <th className="py-1">Carbohidratos (g)</th>
-                  <th className="py-1">Grasas (g)</th>
-                  <th className="py-1">Proteínas (g)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-1">{totalNutrition.calories.toFixed(2)}</td>
-                  <td className="py-1">{totalNutrition.carbs.toFixed(2)}</td>
-                  <td className="py-1">{totalNutrition.fat.toFixed(2)}</td>
-                  <td className="py-1">{totalNutrition.protein.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="mt-4 rounded-3xl shadow-2xl p-4 bg-gray-200">
+            <h3 className="text-xl font-bold mb-4 text-center">🧪 Información Nutricional Total</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {/* Calorías */}
+              <div className="bg-orange-100 text-orange-800 p-4 rounded-xl shadow flex flex-col items-center">
+                <img src="https://img.icons8.com/emoji/48/fire.png" alt="Calorías" className="w-8 h-8 mb-2" />
+                <span className="text-sm font-medium">Calorías</span>
+                <span className="text-2xl font-bold">{totalNutrition.calories.toFixed(0)}</span>
+                <span className="text-xs text-gray-600 mt-1">kcal</span>
+              </div>
+
+              {/* Carbohidratos */}
+              <div className="bg-blue-100 text-blue-800 p-4 rounded-xl shadow flex flex-col items-center">
+                <img src="https://img.icons8.com/external-filled-outlines-amoghdesign/32/external-carbohydrates-fruits-and-vegetables-filled-outlines-amoghdesign.png" alt="Carbohidratos" className="w-8 h-8 mb-2" />
+                <span className="text-sm font-medium">Carbohidratos</span>
+                <span className="text-2xl font-bold">{totalNutrition.carbs.toFixed(1)}</span>
+                <span className="text-xs text-gray-600 mt-1">g</span>
+              </div>
+
+              {/* Grasas */}
+              <div className="bg-red-100 text-red-800 p-4 rounded-xl shadow flex flex-col items-center">
+                <img src="https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-oil-industry-flaticons-flat-flat-icons.png" alt="Grasas" className="w-8 h-8 mb-2" />
+                <span className="text-sm font-medium">Grasas</span>
+                <span className="text-2xl font-bold">{totalNutrition.fat.toFixed(1)}</span>
+                <span className="text-xs text-gray-600 mt-1">g</span>
+              </div>
+
+              {/* Proteínas */}
+              <div className="bg-green-100 text-green-800 p-4 rounded-xl shadow flex flex-col items-center">
+                <img src="https://img.icons8.com/pulsar-color/48/protein-supplement.png" alt="Proteínas" className="w-8 h-8 mb-2" />
+                <span className="text-sm font-medium">Proteínas</span>
+                <span className="text-2xl font-bold">{totalNutrition.protein.toFixed(1)}</span>
+                <span className="text-xs text-gray-600 mt-1">g</span>
+              </div>
+            </div>
           </div>
         )}
+
         <h2 className="text-2xl font-bold mb-4">Instrucciones</h2>
         <div className="space-y-8 mb-6">
 
           {recipe.instructions.map((step: any, index: number) => (
-            <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-sm">
+            <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-sm ">
               <h3 className="text-lg font-semibold text-gray-800">{step.title}</h3>
               <p className="text-sm text-gray-600 mb-2">{step.description}</p>
 
