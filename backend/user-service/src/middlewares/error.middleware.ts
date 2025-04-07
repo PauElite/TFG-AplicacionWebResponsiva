@@ -4,6 +4,6 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
     console.error("❌ Error en el servidor:", err.message); // Imprimir error en consola
 
     res.status(err.status || 500).json({
-        mensaje: err.message || "Error interno del servidor"
+        message: err.message || "Error interno del servidor"
     });
 };

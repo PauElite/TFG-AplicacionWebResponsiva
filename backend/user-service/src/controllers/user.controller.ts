@@ -47,7 +47,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
         console.log(`Verificación de email -> http://localhost:3000/verify-email?token=${emailVerificationToken}`);
 
-        res.status(201).json({ mensaje: "Usuario registrado", usuario: newUser });
+        res.status(201).json({ message: "Usuario registrado", usuario: newUser });
     } catch (error) {
         next(error);
     }
@@ -180,7 +180,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         user.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000);
         await userService.saveUser(user);
 
-        res.status(200).json({ mensaje: "Inicio de sesión exitoso", usuario: user , tokenAcceso: token })
+        res.status(200).json({ message: "Inicio de sesión exitoso", usuario: user , tokenAcceso: token })
     } catch (error){
         next(error);
     }
@@ -234,7 +234,7 @@ export const logoutUser = async (req: Request, res: Response, next: NextFunction
         user.refreshToken = null;
         await userService.saveUser(user);
 
-        res.status(200).json({ mensaje: "Sesión cerrada exitosamente." });
+        res.status(200).json({ message: "Sesión cerrada exitosamente." });
     } catch (error) {
         next(error);
     }
@@ -259,7 +259,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
         res.status(200).json({ message: "Correo enviado con instrucciones para restablecer la contraseña." });
 
-        console.log(`Token de recuperación de contraseña -> ${resetToken}`);
+        console.log(`🔗 Enlace de restablecimiento de contraseña: http://localhost:3000/reset-password?token=${resetToken}`);
     } catch (error) {
         next(error);
     }
@@ -359,7 +359,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
 
         await userService.saveUser(user);
 
-        res.status(200).json({ mensaje: "Usuario actualizado", usuario: user });
+        res.status(200).json({ message: "Usuario actualizado", usuario: user });
     } catch (error) {
         next(error);
     }

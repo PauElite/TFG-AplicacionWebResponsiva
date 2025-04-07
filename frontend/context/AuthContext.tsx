@@ -36,6 +36,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setupUserInterceptors(logout);
     setupRecipeInterceptors(logout);
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
 
 
@@ -45,8 +50,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error: any) {
       console.error("Error en registro:", error);
       // Verifica si el error proviene del backend y contiene información relevante
-      if (error.response && error.response.data && error.response.data.mensaje) {
-        throw new Error(error.response.data.mensaje); // Lanza un error con el mensaje del backend
+      if (error.response && error.response.data && error.response.data.message) {
+        throw new Error(error.response.data.message); // Lanza un error con el mensaje del backend
       } else {
         throw new Error("Error en el servidor, inténtelo más tarde");
       }
@@ -59,6 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(response.data.usuario); // Guardamos el usuario en el estado
 
+      localStorage.setItem("user", JSON.stringify(response.data.usuario));
       // Guardar el token de acceso en localStorage
       localStorage.setItem("accessToken", response.data.tokenAcceso);
       // Guardar el refreshToken en localStorage
@@ -69,8 +75,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Error en login:", error);
 
       // Verifica si el error proviene del backend y contiene información relevante
-      if (error.response && error.response.data && error.response.data.mensaje) {
-        throw new Error(error.response.data.mensaje); // Lanza un error con el mensaje del backend
+      if (error.response && error.response.data && error.response.data.message) {
+        throw new Error(error.response.data.message); // Lanza un error con el mensaje del backend
       } else {
         throw new Error("Error en el servidor, inténtelo más tarde");
       }
@@ -123,7 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(prev => {
         if (!prev) return prev; // Si no hay usuario actual, no hacemos nada
-  
+
         return {
           ...prev,
           name: updates.name ?? prev.name,
@@ -141,6 +147,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       //await apiUser.post("/logout");
       localStorage.removeItem("accessToken"); // Eliminar el accessToken al cerrar sesión
       localStorage.removeItem("refreshToken"); // Eliminar el refreshToken al cerrar sesión
+      localStorage.removeItem("user"); // Eliminar el usuario del localStorage
       setUser(null);
     } catch (error) {
       console.error("Error al cerrar sesión:", error);

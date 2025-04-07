@@ -34,7 +34,7 @@ export const setupUserInterceptors = (logout: () => void) => {
       const originalRequest = error.config;
 
       // Si el token ha expirado y la petición aún no se ha reintentado
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes("login")) {
         originalRequest._retry = true;
 
         try {

@@ -43,11 +43,11 @@ export default function VerifyEmailPage() {
                         router.push("/login");
                     }, 3000);
                 } else {
-                    if (data.mensaje?.toLowerCase().includes("expirado")) {
-                        console.log("Token expirado:", data.mensaje);
+                    if (data.message?.toLowerCase().includes("expirado")) {
+                        console.log("Token expirado:", data.message);
                         setStatus("expired");
                     } else {
-                        console.log("Error al verificar el correo:", data.mensaje);
+                        console.log("Error al verificar el correo:", data.message);
                         setStatus("error");
                     }
                     setMessage(data.message || `Error ${res.status}: No se pudo verificar el correo.`);

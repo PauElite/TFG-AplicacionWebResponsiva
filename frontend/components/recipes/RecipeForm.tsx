@@ -2,8 +2,9 @@ import { useState } from "react";
 import type { RecetaFormData } from "@/types/receta"
 import type { Step } from "../../../shared/models/recipe";
 import { useEffect } from "react";
-import { getEmbedMedia, getImageSrc } from "@/utils/mediaUtils";
+import { getImageSrc } from "@/utils/mediaUtils";
 import { BurgerLoadingAnimation } from "@/components/views/loading/BurgerLoadingAnimation";
+import { Toast } from "@/components/ui/Toast";
 
 interface RecipeFormProps {
     onSubmit: (formData: RecetaFormData) => Promise<void>;
@@ -25,6 +26,7 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
             imageUrl: ""
         }
     );
+    const [toastMessage, setToastMessage] = useState<string>("");
 
     useEffect(() => {
         if (initialData) {
@@ -34,6 +36,11 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const errorMsg = validarReceta(formData);
+        if (errorMsg) {
+            setToastMessage(errorMsg);
+            return;
+        }
         await onSubmit(formData);
     };
 
@@ -75,11 +82,44 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
         setFormData(prev => ({ ...prev, instructions: newInstructions }));
     };
 
+    const validarReceta = (formData: RecetaFormData): string | null => {
+        if (!formData.title.trim()) {
+            return "El título es obligatorio.";
+        }
+
+        if (!formData.description.trim()) {
+            return "La descripción es obligatoria.";
+        }
+
+        if (formData.prepTime <= 0) {
+            return "El tiempo de preparación no puede ser negativo o cero.";
+        }
+
+        const dificultad = Number(formData.difficulty);
+        if (isNaN(dificultad) || dificultad < 1 || dificultad > 5) {
+            return "La dificultad debe estar entre 1 y 5.";
+        }
+
+        if (!formData.ingredients.length || formData.ingredients.some(i => !i.trim())) {
+            return "Todos los ingredientes deben estar completos.";
+        }
+
+        if (
+            !formData.instructions.length ||
+            formData.instructions.some(step => !step.title.trim() || !step.description.trim())
+        ) {
+            return "Todos los pasos deben tener título y descripción.";
+        }
+
+        return null; // Todo OK
+    };
+
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl text-center font-bold mb-6">Subir mi propia receta</h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 {/* Sección básica */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-xl font-semibold mb-4">Información básica</h2>
@@ -93,7 +133,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                 value={formData.title}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
-                                required
                             />
                         </div>
 
@@ -105,7 +144,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                 rows={3}
-                                required
                             />
                         </div>
 
@@ -119,7 +157,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                     min="0"
-                                    required
                                 />
                             </div>
 
@@ -133,7 +170,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                     className="flex-grow w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                     min="1"
                                     max="5"
-                                    required
                                 />
                             </div>
                             <div>
@@ -200,7 +236,7 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                     <input
                                         type="url"
                                         name="imageUrl"
-                                        value={getImageSrc(formData.imageUrl)}
+                                        value={formData.imageUrl}
                                         onChange={handleChange}
                                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                         placeholder="https://ejemplo.com/imagen.jpg"
@@ -240,7 +276,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                 onChange={(e) => handleIngredientChange(index, e.target.value)}
                                 className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200"
                                 placeholder="Ej: 200g de pasta"
-                                required
                             />
                             {formData.ingredients.length > 1 && (
                                 <button
@@ -277,7 +312,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                     onChange={(e) => handleInstructionChange(index, "title", e.target.value)}
                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder={`Paso ${index + 1}: ...`}
-                                    required
                                 />
                             </div>
 
@@ -288,7 +322,6 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                                     onChange={(e) => handleInstructionChange(index, "description", e.target.value)}
                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     rows={3}
-                                    required
                                 />
                             </div>
                             {initialData ? (
@@ -380,15 +413,18 @@ export const RecipeForm = ({ onSubmit, loading, error, initialData }: RecipeForm
                     >
                         {loading ? (
                             <>
-                                Creando receta...
+                                {initialData ? "Actualizando receta..." : "Creando receta..."}
                             </>
                         ) : (
-                            'Publicar receta'
+                            initialData ? "Actualizar receta" : "Publicar receta"
                         )}
                     </button>
                     {loading && <BurgerLoadingAnimation />}
                 </div>
             </form>
+            {toastMessage && (
+                <Toast message={toastMessage} onClose={() => setToastMessage("")} />
+            )}
         </div>
     );
 };

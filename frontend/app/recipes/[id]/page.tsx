@@ -203,7 +203,7 @@ export default function RecipeDetail() {
         <div className="space-y-8 mb-6">
 
           {recipe.instructions.map((step: any, index: number) => (
-            <div key={index}>
+            <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold text-gray-800">{step.title}</h3>
               <p className="text-sm text-gray-600 mb-2">{step.description}</p>
 

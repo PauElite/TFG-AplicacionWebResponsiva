@@ -122,7 +122,7 @@ export const RecipeFilter = () => {
         <div className="w-full sm:w-auto sm:ml-auto text-center">
 
           <select
-          className="w-full sm:w-auto px-4 py-2 border rounded-lg bg-white text-gray-800"
+          className="sm:w-auto px-4 py-2 border rounded-lg bg-white text-gray-800"
             onChange={(e) => {
               const params = new URLSearchParams(window.location.search);
               if (e.target.value) {
@@ -133,7 +133,6 @@ export const RecipeFilter = () => {
               router.push(`/?${params.toString()}`);
             }}
             defaultValue={searchParams.get("sort") || ""}
-            className="px-4 py-2 border rounded-lg bg-white text-gray-800"
           >
             <option value="">Ordenar por...</option>
             <option value="popularity">Popularidad</option>
