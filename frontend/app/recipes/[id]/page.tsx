@@ -25,26 +25,30 @@ export default function RecipeDetail() {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
 
+  // Estados para la información nutricional
+  const [nutritionalData, setNutritionalData] = useState<any>(null);
+  const [showNutrition, setShowNutrition] = useState<boolean>(false);
+
 
   useEffect(() => {
     const loadRecipe = async () => {
       try {
         const recipeData = await recipeService.getRecipeById(Number(id));
         setRecipe(recipeData);
-  
+
         if (recipeData) {
           const user = await userService.getUserById(recipeData.creatorId);
           setUsername(user.name);
           setCreatorId(recipeData.creatorId);
         }
-  
+
       } catch (error) {
         console.error("Error cargando datos de la receta:", error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     if (id) loadRecipe();
   }, [id]);
 
@@ -101,6 +105,46 @@ export default function RecipeDetail() {
       setToast("No se pudo eliminar la receta.");
     }
   };
+
+  // Función para alternar la visibilidad de la info nutricional
+  const handleToggleNutrition = async () => {
+    // Si se va a mostrar y aún no se han obtenido los datos, hacer la petición
+    if (!showNutrition && !nutritionalData) {
+      try {
+        const response = await axios.post(
+          "https://trackapi.nutritionix.com/v2/natural/nutrients",
+          { query: recipe.ingredients.join("\n") },
+          {
+            headers: {
+              "x-app-id": "419a51cd",
+              "x-app-key": "cbddf39aad6117409de2621edc93af54",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setNutritionalData(response.data);
+      } catch (error) {
+        console.error("Error al obtener información nutricional:", error);
+        setToast("Error al obtener información nutricional");
+      }
+    }
+    setShowNutrition(!showNutrition);
+  };
+
+  // Si se dispone de datos nutricionales, sumar los valores totales
+  let totalNutrition = null;
+  if (nutritionalData && nutritionalData.foods) {
+    totalNutrition = nutritionalData.foods.reduce(
+      (acc: any, food: any) => {
+        acc.calories += food.nf_calories || 0;
+        acc.protein += food.nf_protein || 0;
+        acc.fat += food.nf_total_fat || 0;
+        acc.carbs += food.nf_total_carbohydrate || 0;
+        return acc;
+      },
+      { calories: 0, protein: 0, fat: 0, carbs: 0 }
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 py-8">
@@ -199,6 +243,41 @@ export default function RecipeDetail() {
           ))}
         </ul>
 
+        {/* Botón para mostrar/ocultar la información nutricional */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={handleToggleNutrition}
+            className="px-4 py-2 bg-[#8b5e3c] text-white rounded hover:bg-[#7a4c32] transition-colors flex items-center gap-2"
+          >
+            {showNutrition ? "Ocultar información nutricional" : "Ver información nutricional"}
+            {showNutrition ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+        </div>
+
+        {/* Sección expandible de información nutricional */}
+        {showNutrition && totalNutrition && (
+          <div className="mt-4 border p-4 rounded">
+            <h3 className="text-xl font-bold mb-2">Información Nutricional Total</h3>
+            <table className="w-full text-left">
+              <thead>
+                <tr>
+                  <th className="py-1">Calorías</th>
+                  <th className="py-1">Carbohidratos (g)</th>
+                  <th className="py-1">Grasas (g)</th>
+                  <th className="py-1">Proteínas (g)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-1">{totalNutrition.calories.toFixed(2)}</td>
+                  <td className="py-1">{totalNutrition.carbs.toFixed(2)}</td>
+                  <td className="py-1">{totalNutrition.fat.toFixed(2)}</td>
+                  <td className="py-1">{totalNutrition.protein.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
         <h2 className="text-2xl font-bold mb-4">Instrucciones</h2>
         <div className="space-y-8 mb-6">
 

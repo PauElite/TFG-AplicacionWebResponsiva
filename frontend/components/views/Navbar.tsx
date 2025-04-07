@@ -4,16 +4,22 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Toast } from "@/components/ui/Toast";
+import { Anton } from "next/font/google";
+
+const anton = Anton({
+  weight: "400", // Anton solo tiene peso 400
+  subsets: ["latin"],
+});
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [toast, setToast] = useState<string | null>(null);
-  
+
 
   return (
     <nav className="bg-[#8b5e3c] p-4 text-white shadow-md">
       <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-2 sm:gap-0">
-        <Link href="/" className="text-lg font-bold">El Fogón Rebelde</Link>
+        <Link href="/" className={`${anton.className} text-2xl text-center tracking-wide underline`}>El Fogón Rebelde</Link>
 
         <div className="flex flex-row items-center gap-4 flex-wrap justify-center">
           <Link
@@ -34,14 +40,14 @@ export default function Navbar() {
         <div className="flex items-center gap-4 flex-wrap justify-center">
           {user ? (
             <>
-              <Link href={`/profile/${user.id}`} className="hover:underline">Perfil</Link>
-              <button onClick={logout} className="hover:underline">Cerrar sesión</button>
+              <Link href={`/profile/${user.id}`} className={`${anton.className} hover:underline tracking-wide`}>Perfil</Link>
+              <button onClick={logout} className={`${anton.className} hover:underline tracking-wide`}>Cerrar sesión</button>
 
             </>
           ) : (
             <>
-              <Link href="/login" className="hover:underline">Iniciar sesión</Link>
-              <Link href="/register" className="hover:underline">Registrarse</Link>
+              <Link href="/login" className={`${anton.className} hover:underline tracking-wide`}>Iniciar sesión</Link>
+              <Link href="/register" className={`${anton.className} hover:underline tracking-wide`}>Registrarse</Link>
             </>
           )}
         </div>
