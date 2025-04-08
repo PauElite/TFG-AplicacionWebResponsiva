@@ -195,7 +195,7 @@ export default function RecipeDetail() {
           <div className="flex justify-center gap-4 items-center mb-6">
             {recipe.suitableFor.includes("airfrier") && (
               <Link
-                href={{ pathname: "/", query: { suitableFor: "airfrier" } }}
+                href={{ pathname: "/recipes", query: { suitableFor: "airfrier" } }}
                 className="group flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg shadow-sm transition-shadow duration-200 hover:shadow-md hover:bg-gray-50 cursor-pointer"
               >
                 <img
@@ -210,7 +210,7 @@ export default function RecipeDetail() {
 
             {recipe.suitableFor.includes("horno") && (
               <Link
-                href={{ pathname: "/", query: { suitableFor: "horno" } }}
+                href={{ pathname: "/recipes", query: { suitableFor: "horno" } }}
                 className="group flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg shadow-sm transition-shadow duration-200 hover:shadow-md hover:bg-gray-50 cursor-pointer"
               >
                 <img

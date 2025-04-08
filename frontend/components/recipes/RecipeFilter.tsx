@@ -33,7 +33,7 @@ export const RecipeFilter = () => {
     const params = new URLSearchParams();
     filters.forEach((val) => params.append("suitableFor", val));
     if (searchText.trim()) params.set("search", searchText);
-    router.push(`/?${params.toString()}`);
+    router.push(`/recipes/?${params.toString()}`);
   };
 
   const toggleOption = (value: string) => {

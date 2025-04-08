@@ -1,39 +1,68 @@
 "use client";
 
-import { useGetAllRecipes } from "@/hooks/useGetAllRecipes";
-import { RecipeList } from "@/components/recipes/RecipeList";
-import { BurgerLoadingAnimation } from "@/components/views/loading/BurgerLoadingAnimation";
-import { RecipeFilter } from "@/components/recipes/RecipeFilter";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { recipeService } from "@/services/recipeService";
+import { Recipe } from "../../shared/models/recipe";
+import { RecipeSlider } from "@/components/recipes/RecipeSlider";
 
-export default function Home() {
-  const searchParams = useSearchParams();
-  const suitableFor = searchParams.getAll("suitableFor");
-  const search = searchParams.get("search") || "";
-  const sort = searchParams.get("sort") || "";
 
-  const { recipes, loading, error } = useGetAllRecipes(suitableFor.length > 0 ? suitableFor : undefined, 
-    search, sort);
+export default function HomePage() {
+  const [popularRecipes, setPopularRecipes] = useState<Recipe[]>([]);
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">{error}</h1>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchPopular = async () => {
+      try {
+        const recipes = await recipeService.fetchPopularRecipes();
+        setPopularRecipes(recipes);
+        console.log("Recetas populares", recipes);
+      } catch (err) {
+        console.error("Error al cargar recetas populares", err);
+      }
+    };
+
+    fetchPopular();
+  }, []);
 
   return (
-    <div className="flex flex-col items-center min-h-screen px-4 py-8">
-      <RecipeFilter />
-      {loading ? (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <BurgerLoadingAnimation />
-          <h1 className="text-4xl font-bold">Cargando recetas...</h1>
-        </div>
-      ) : (
-        <RecipeList recipes={recipes} />
+    <main className="px-6 py-10 space-y-16">
+      {/* Hero o bienvenida */}
+      <section className="text-center space-y-4">
+        <h1 className="text-4xl sm:text-5xl font-bold">Bienvenido a El Fogón Rebelde </h1>
+        <p className="text-lg text-gray-600">Explora, descubre y comparte recetas deliciosas de todos los rincones del planeta.</p>
+      </section>
+
+      {/* Carrusel de recetas populares */}
+      {popularRecipes.length > 0 && (
+        <RecipeSlider recipes={popularRecipes} />
       )}
-    </div>
+
+      {/* Explorar recetas */}
+      <section className="bg-gray-100 rounded-xl p-6 text-center space-y-2 shadow-sm">
+        <h2 className="text-xl font-semibold">🔍 Explorar recetas</h2>
+        <p className="text-gray-600">Filtra por dificultad, tiempo, ingredientes y más.</p>
+        <Link href="/recipes" className="inline-block mt-2 bg-[#8b5e3c] text-white px-4 py-2 rounded hover:bg-[#754a2f]">
+          Explorar ahora
+        </Link>
+      </section>
+
+      {/* ¿Qué me cocino hoy? */}
+      <section className="bg-yellow-100 rounded-xl p-6 text-center space-y-2 shadow-sm">
+        <h2 className="text-xl font-semibold">🤔 ¿Qué me cocino hoy?</h2>
+        <p className="text-gray-600">¿No sabes qué preparar? Nosotros te inspiramos.</p>
+        <Link href="/random" className="inline-block mt-2 bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+          Sorpréndeme
+        </Link>
+      </section>
+
+      {/* Recetas del mundo */}
+      <section className="bg-blue-100 rounded-xl p-6 text-center space-y-2 shadow-sm">
+        <h2 className="text-xl font-semibold">🗺️ Recetas del mundo</h2>
+        <p className="text-gray-600">Descubre sabores por países en un mapa interactivo.</p>
+        <Link href="/mapa" className="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Ver mapa
+        </Link>
+      </section>
+    </main>
   );
 }

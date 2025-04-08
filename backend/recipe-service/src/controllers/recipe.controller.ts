@@ -216,6 +216,7 @@ export const getAllRecipes = async (req: Request, res: Response, next: NextFunct
     const suitableForQuery = req.query.suitableFor;
     const search = typeof req.query.search === "string" ? req.query.search : undefined;
     const sort = typeof req.query.sort === "string" ? req.query.sort : undefined;
+    const limit = typeof req.query.limit === "string" ? parseInt(req.query.limit) : undefined;
 
     const suitableFor: string[] | undefined = Array.isArray(suitableForQuery)
       ? suitableForQuery.map(String)
@@ -223,7 +224,7 @@ export const getAllRecipes = async (req: Request, res: Response, next: NextFunct
         ? [String(suitableForQuery)]
         : undefined;
 
-    const recipes = await recipeService.getAllRecipes(suitableFor, search, sort as any);
+    const recipes = await recipeService.getAllRecipes(suitableFor, search, sort as any, limit);
     res.status(200).json(recipes);
   } catch (error) {
     console.error("❌ Error al obtener las recetas", error);

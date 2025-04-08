@@ -43,6 +43,29 @@ class RecipeService {
     }
   }
 
+  async fetchPopularRecipes(): Promise<Recipe[]> {
+    try {
+      const response = await apiRecipe.get(this.apiUrl, {
+        params: {
+          sort: "popularity",
+          limit: 9,
+        },
+        paramsSerializer: (params) => {
+          const searchParams = new URLSearchParams();
+          if (params.sort) searchParams.set("sort", params.sort);
+          if (params.limit) searchParams.set("limit", String(params.limit));
+          return searchParams.toString();
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener recetas populares", error);
+      throw error;
+    }
+  }
+
+
   async getRecipeById(recipeId: number): Promise<Recipe | null> {
     try {
       const response = await apiRecipe.get(`${this.apiUrl}/${recipeId}`);

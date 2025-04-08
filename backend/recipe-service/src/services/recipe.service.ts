@@ -40,7 +40,7 @@ export class RecipeService {
   // Si se proporciona un parámetro suitableFor, filtra las recetas por ese valor
   // Si se proporciona un parámetro search, busca recetas por título o ingredientes
   // Si no se proporciona ninguno, devuelve todas las recetas
-  async getAllRecipes(suitableFor?: string[], search?: string, sort?: "popularity" | "difficulty" | "prepTime"
+  async getAllRecipes(suitableFor?: string[], search?: string, sort?: "popularity" | "difficulty" | "prepTime", limit?: number
   ): Promise<Recipe[]> {
     const query = this.recipeRepository.createQueryBuilder("recipe");
     const whereParts: string[] = [];
@@ -86,6 +86,10 @@ export class RecipeService {
     // Ordenamiento
     if (sort) {
       query.orderBy(`recipe.${sort}`, "DESC");
+    }
+
+    if (limit) {
+      query.limit(limit);
     }
 
     return await query.getMany();
