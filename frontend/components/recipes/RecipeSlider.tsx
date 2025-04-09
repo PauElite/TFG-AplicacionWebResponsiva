@@ -66,7 +66,7 @@ export const RecipeSlider: React.FC<RecipeSliderProps> = ({ recipes }) => {
           href="/recipes?sort=popularity"
           className="text-sm text-[#8b5e3c] hover:underline"
         >
-          Ver todas →
+          Ver todas
         </Link>
       </div>
 

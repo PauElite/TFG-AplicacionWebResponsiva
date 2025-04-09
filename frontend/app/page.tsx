@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { recipeService } from "@/services/recipeService";
 import { Recipe } from "../../shared/models/recipe";
 import { RecipeSlider } from "@/components/recipes/RecipeSlider";
+import { RecipeSliderSkeleton } from "@/components/skeleton/RecipeSliderSkeleton";
 
 
 export default function HomePage() {
   const [popularRecipes, setPopularRecipes] = useState<Recipe[]>([]);
+  const [loadingPopularRecipes, setLoadingPopularRecipes] = useState(true);
 
   useEffect(() => {
     const fetchPopular = async () => {
@@ -18,6 +20,8 @@ export default function HomePage() {
         console.log("Recetas populares", recipes);
       } catch (err) {
         console.error("Error al cargar recetas populares", err);
+      } finally {
+        setLoadingPopularRecipes(false);
       }
     };
 
@@ -25,16 +29,17 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="px-6 py-10 space-y-16">
+    <main className="px-16 py-10 space-y-16">
       {/* Hero o bienvenida */}
       <section className="text-center space-y-4">
         <h1 className="text-4xl sm:text-5xl font-bold">Bienvenido a El Fogón Rebelde </h1>
         <p className="text-lg text-gray-600">Explora, descubre y comparte recetas deliciosas de todos los rincones del planeta.</p>
       </section>
 
-      {/* Carrusel de recetas populares */}
-      {popularRecipes.length > 0 && (
-        <RecipeSlider recipes={popularRecipes} />
+      {loadingPopularRecipes ? (
+        <RecipeSliderSkeleton />
+      ) : (
+        popularRecipes.length > 0 && <RecipeSlider recipes={popularRecipes} />
       )}
 
       {/* Explorar recetas */}

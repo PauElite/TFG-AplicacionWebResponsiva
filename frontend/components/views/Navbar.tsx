@@ -119,7 +119,6 @@ export default function Navbar() {
             className="flex items-center justify-center gap-2 md:bg-white md:text-black md:px-4 md:py-2 md:rounded-lg md:hover:bg-blue-100"
           >
             {menuOpen ? <X /> : <Menu />}
-            <span className="hidden md:inline">Menú</span>
           </button>
         </div>
 

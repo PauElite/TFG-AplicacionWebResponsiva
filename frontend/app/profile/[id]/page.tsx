@@ -88,8 +88,10 @@ export default function UserProfile() {
 
             {/* Lista de recetas */}
             <div className="p-2 sm:p-4">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-4">Recetas del creador</h2>
-                <RecipeList recipes={recipes} />
+                <div className="w-full max-w-6xl mx-auto">
+                    <h2 className="text-xl sm:text-2xl font-semibold mb-4 ml-4">Recetas del creador</h2>
+                    <RecipeList recipes={recipes} />
+                </div>
             </div>
         </div>
     );

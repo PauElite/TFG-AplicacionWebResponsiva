@@ -22,20 +22,20 @@ export default function VerifyEmailPage() {
                 setMessage("Token de verificación no proporcionado.");
                 return;
             }
-    
+
             try {
                 const res = await fetch(`http://localhost:3001/recetas/users/verify-email?token=${token}`);
-    
+
                 const contentType = res.headers.get("content-type");
                 let data: any = {};
-    
+
                 if (contentType && contentType.includes("application/json")) {
                     data = await res.json();
                 } else {
                     const text = await res.text();
                     data.message = text;
                 }
-    
+
                 if (res.ok) {
                     setStatus("success");
                     setMessage(data.message || "¡Correo verificado con éxito!");
@@ -58,10 +58,10 @@ export default function VerifyEmailPage() {
                 setMessage(err.message || "Error de conexión con el servidor.");
             }
         };
-    
+
         verifyEmail();
     }, [searchParams, router]);
-    
+
 
     const handleResend = async () => {
         setResendMessage("");
@@ -96,7 +96,8 @@ export default function VerifyEmailPage() {
 
 
     return (
-        <div className="bg-white p-6 rounded shadow-md max-w-md w-full text-center">
+        <div className="flex flex-col items-center justify-center px-4 py-22 flex-grow">
+            <div className="bg-white p-6 rounded shadow-md max-w-md w-full text-center">
                 {status === "pending" && (
                     <p className="text-gray-600 text-sm">Verificando tu correo electrónico...</p>
                 )}
@@ -140,5 +141,6 @@ export default function VerifyEmailPage() {
                     </>
                 )}
             </div>
+        </div>
     );
 }
