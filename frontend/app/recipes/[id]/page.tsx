@@ -16,7 +16,6 @@ import { getEmbedMedia, getImageSrc } from "@/utils/mediaUtils";
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const { getUserById } = userService;
   const [username, setUsername] = useState<any>(null);
   const [creatorId, setCreatorId] = useState<any>(null);
   const { id } = useParams(); // Obtener el ID de la URL dinámica
